@@ -40,7 +40,7 @@
 			<TextInput type="textarea" label="Content" bind:value={noteContent}></TextInput>
 			<!-- Close button -->
 			<div class="flex justify-end">
-				<Button label="Submit" onclick={handleSubmit}></Button>
+				<Button onclick={handleSubmit}>Submit</Button>
 			</div>
 		</div>
 	</div>
