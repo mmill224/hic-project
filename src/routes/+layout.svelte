@@ -32,7 +32,7 @@
 				<form>
 					<TextInput bind:value={username} label="Username"></TextInput>
 					<TextInput bind:value={password} label="Password" type="password"></TextInput>
-					<Button label="Submit" onclick={handleLoginSubmit}></Button>
+					<Button onclick={handleLoginSubmit}>Submit</Button>
 				</form>
 			</div>
 		</div>

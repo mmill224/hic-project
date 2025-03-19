@@ -11,7 +11,7 @@
 {#if type == 'textarea'}
 	<div class="relative my-2 {classes}">
 		<textarea
-			class="peer w-full rounded-lg border border-gray-300 bg-transparent p-4 pt-6 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+			class="peer w-full rounded-lg border border-gray-300 bg-gray-800  p-4 pt-6 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
 			placeholder=" "
 			bind:value
 			onchange={() => onchange()}
@@ -27,7 +27,7 @@
 	<div class="relative my-2 {classes}">
 		<input
 			{type}
-			class="peer w-full rounded-lg border border-gray-300 bg-transparent p-4 pt-6 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+			class="peer w-full rounded-lg border border-gray-300 bg-gray-800 p-4 pt-6 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
 			placeholder=" "
 			bind:value
 			onchange={() => onchange()}
