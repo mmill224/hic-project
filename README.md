@@ -1,7 +1,7 @@
 The overall idea of this is to make a note taking app that allows users to create, filter, and delete notes. 
 
 ## Contributing:
-Make or choose an issue, then clone the repo, make a branch, write your feature, then make a pull request with a helpful description. Allow another contibutor to review your code before merging into main if possible. Ask in the discord if needed.
+Make or choose an issue, then make a branch, write your feature, then make a pull request with a helpful description. Allow another contibutor to review your code before merging into main if possible. Ask in the discord if needed.
 Matt is happy to help.
 
 ----------------------------------------
