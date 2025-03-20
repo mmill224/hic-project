@@ -26,10 +26,7 @@
 	});
 </script>
 
-<div
-	class="h-screen justify-center px-10 py-3 text-center"
-	style="max-width: 1000px; margin: auto; min-width: 400px;"
->
+<div class="mx-auto text-center w-300 m-5">
 	<div class="flex justify-between py-4">
 		<input
 			type="search"
