@@ -4,16 +4,26 @@
 	import type { Note } from "$lib/db";
 	import { addOrUpdateNote } from "$lib/dbDal";
 
-	export let note: Note = {
+	const DEFAULT_NOTE: Note = {
 		title: "",
 		content: "",
 		createdDate: new Date(),
 		dueDate: undefined,
 	};
+	type NoteProps = {
+		note?: Note;
+		open: boolean;
+		onupdate?: (note: Note) => void;
+	};
 
-	export let open = false;
+	let {
+		onupdate,
+		open = $bindable(false),
+		note: _note = { ...DEFAULT_NOTE },
+	}: NoteProps = $props();
+	let note = $state(_note);
 
-	let success = false;
+	let success = $state(false);
 
 	async function handleSubmit() {
 		// if the note is already in the db, do not change the created date
@@ -21,12 +31,16 @@
 		if (note?.id && note.createdDate) {
 			createdDate = note.createdDate;
 		}
+		const newNote: Note = {
+			...note,
+		};
 
-		success = await addOrUpdateNote(note);
+		success = await addOrUpdateNote(newNote);
 
 		if (success) {
 			open = false;
 		}
+		onupdate && onupdate(newNote);
 	}
 </script>
 
@@ -50,7 +64,15 @@
 			<div class="flex justify-between">
 				<div class="flex">
 					<input
-						bind:value={note.dueDate}
+						oninput={(e) => {
+							note.dueDate = new Date();
+							const tempDate = new Date(e.currentTarget.value);
+							note.dueDate.setFullYear(tempDate.getFullYear());
+							note.dueDate.setMonth(tempDate.getMonth());
+							note.dueDate.setDate(tempDate.getDate());
+							console.log(note.dueDate.toLocaleString());
+						}}
+						value={note.dueDate?.toISOString().split("T")[0]}
 						type="date"
 						id="date"
 						class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
