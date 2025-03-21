@@ -28,7 +28,7 @@
 	async function handleSubmit() {
 		errorMessage = "";
 		// if the note is already in the db, do not change the created date
-		var createdDate: Date = new Date();
+		var createdDate: Date;
 		if (note?.id && note.createdDate) {
 			createdDate = note.createdDate;
 		} else {
