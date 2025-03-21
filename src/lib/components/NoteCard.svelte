@@ -100,7 +100,7 @@
 
 {#if editMode}
 	<AddOrUpdateNoteModal
-		{note}
+		note={{ ...note }}
 		bind:open={editMode}
 		onupdate={(newNote: Note) => {
 			note = newNote;

@@ -8,7 +8,7 @@
 		title: "",
 		content: "",
 		createdDate: new Date(),
-		dueDate: new Date(),
+		dueDate: undefined,
 	};
 	type NoteProps = {
 		note?: Note;
