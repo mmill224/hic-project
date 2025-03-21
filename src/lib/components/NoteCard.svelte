@@ -4,10 +4,10 @@
 	import AddOrUpdateNoteModal from "./AddOrUpdateNoteModal.svelte";
 	import { deleteNote } from "$lib/dbDal";
 	import { Trash2, Pencil } from "lucide-svelte";
-	import { onMount } from "svelte";
 
-	let { note = $bindable(undefined), id = 0 } = $props<{
-		note: Note | undefined;
+	let { note = $bindable(), id = $bindable(0) } = $props<{
+		note: Note;
+		id: number;
 	}>();
 
 	let expandTitle = $state(false);
@@ -25,7 +25,7 @@
 		}
 	};
 
-	onMount(() => {
+	$effect(() => {
 		if (note?.dueDate) {
 			dueDateString =
 				"Due: " +
@@ -99,5 +99,11 @@
 </div>
 
 {#if editMode}
-	<AddOrUpdateNoteModal bind:open={editMode} bind:note></AddOrUpdateNoteModal>
+	<AddOrUpdateNoteModal
+		{note}
+		bind:open={editMode}
+		onupdate={(newNote: Note) => {
+			note = newNote;
+		}}
+	></AddOrUpdateNoteModal>
 {/if}
