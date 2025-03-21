@@ -27,7 +27,6 @@
 
 	$effect(() => {
 		if (note?.dueDate) {
-			console.log(note.dueDate);
 			dueDateString =
 				"Due: " +
 				new Date(note.dueDate).toLocaleDateString("en-US", {
@@ -38,7 +37,6 @@
 		}
 
 		if (note?.createdDate) {
-			console.log(note.createdDate);
 			createdDateString =
 				"Created: " +
 				note.createdDate.toLocaleDateString("en-US", {

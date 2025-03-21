@@ -8,7 +8,7 @@
 		title: "",
 		content: "",
 		createdDate: new Date(),
-		dueDate: undefined,
+		dueDate: new Date(),
 	};
 	type NoteProps = {
 		note?: Note;
@@ -66,11 +66,10 @@
 					<input
 						oninput={(e) => {
 							note.dueDate = new Date();
-							const tempDate = new Date(e.currentTarget.value);
-							note.dueDate.setFullYear(tempDate.getFullYear());
-							note.dueDate.setMonth(tempDate.getMonth());
-							note.dueDate.setDate(tempDate.getDate());
-							console.log(note.dueDate.toLocaleString());
+							const tempDate = e.currentTarget.value.split("-");
+							note.dueDate.setFullYear(parseInt(tempDate[0]));
+							note.dueDate.setMonth(parseInt(tempDate[1]) - 1);
+							note.dueDate.setDate(parseInt(tempDate[2]));
 						}}
 						value={note.dueDate?.toISOString().split("T")[0]}
 						type="date"
