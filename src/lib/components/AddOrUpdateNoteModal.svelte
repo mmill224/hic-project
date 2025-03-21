@@ -31,7 +31,10 @@
 		var createdDate: Date = new Date();
 		if (note?.id && note.createdDate) {
 			createdDate = note.createdDate;
+		} else {
+			createdDate = new Date();
 		}
+		note.createdDate = createdDate;
 		if (!note.title) {
 			errorMessage = "Please add a title to your note";
 			return;
