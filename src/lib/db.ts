@@ -13,6 +13,8 @@ export interface Note {
     id?: number;
     title: string | undefined;
     content: string | undefined;
+    dueDate: Date | undefined;
+    createdDate: Date | undefined;
 }
 
 export class MyAppDatabase extends Dexie {
@@ -22,7 +24,7 @@ export class MyAppDatabase extends Dexie {
     constructor() {
         super('myAppDatabase');
         this.version(1).stores({
-            notes: '++id, title, content', // primary key and indexed properties
+            notes: '++id, title, content, dueDate, createdDate', // primary key and indexed properties
             tags: '++id, name, color, noteId'
         });
         this.notes = this.table('notes');

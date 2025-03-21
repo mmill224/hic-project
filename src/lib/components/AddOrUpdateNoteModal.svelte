@@ -1,23 +1,28 @@
 <script lang="ts">
-	import TextInput from './TextInput.svelte';
-	import Button from './Button.svelte';
-	import type { Note } from '$lib/db';
-	import { addNoteToDb } from '$lib/dbDal';
+	import TextInput from "./TextInput.svelte";
+	import Button from "./Button.svelte";
+	import type { Note } from "$lib/db";
+	import { addOrUpdateNote } from "$lib/dbDal";
 
-	export let note: Note | undefined = undefined;
+	export let note: Note = {
+		title: "",
+		content: "",
+		createdDate: new Date(),
+		dueDate: undefined,
+	};
+
 	export let open = false;
 
-	let noteTitle = note?.title ?? '';
-	let noteContent = note?.title ?? '';
 	let success = false;
 
 	async function handleSubmit() {
-		var newNote: Note = {
-			title: noteTitle,
-			content: noteContent
-		};
+		// if the note is already in the db, do not change the created date
+		var createdDate: Date = new Date();
+		if (note?.id && note.createdDate) {
+			createdDate = note.createdDate;
+		}
 
-		success = await addNoteToDb(newNote);
+		success = await addOrUpdateNote(note);
 
 		if (success) {
 			open = false;
@@ -34,12 +39,24 @@
 		<div class="w-full max-w-sm rounded-lg bg-gray-600 p-6 shadow-lg">
 			<div class="mb-4 flex justify-between text-xl font-semibold">
 				<h2 class="">Edit note</h2>
-				<button onclick={() => (open = !open)} class="cursor-pointer">&times;</button>
+				<button onclick={() => (open = !open)} class="cursor-pointer"
+					>&times;</button
+				>
 			</div>
-			<TextInput label="Title" bind:value={noteTitle}></TextInput>
-			<TextInput type="textarea" label="Content" bind:value={noteContent}></TextInput>
-			<!-- Close button -->
-			<div class="flex justify-end">
+			<TextInput label="Title" bind:value={note.title}></TextInput>
+			<TextInput type="textarea" label="Content" bind:value={note.content}
+			></TextInput>
+
+			<div class="flex justify-between">
+				<div class="flex">
+					<input
+						bind:value={note.dueDate}
+						type="date"
+						id="date"
+						class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+					/>
+				</div>
+
 				<Button onclick={handleSubmit}>Submit</Button>
 			</div>
 		</div>

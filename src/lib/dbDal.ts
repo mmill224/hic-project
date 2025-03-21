@@ -2,10 +2,15 @@ import Dexie from "dexie";
 import { db } from "$lib/db";
 import type { Note, Tag } from "$lib/db";
 
-export async function addNoteToDb(note: Note, tags: Tag[] = []): Promise<boolean> {
+export async function addOrUpdateNote(note: Note, tags: Tag[] = []): Promise<boolean> {
     try {
-        await db.notes.add(note)
-        await db.tags.bulkAdd(tags);
+        if (note.id) {
+            await db.notes.update(note.id, note);
+            await db.tags.bulkAdd(tags);
+        } else {
+            await db.notes.add(note);
+            await db.tags.bulkAdd(tags);
+        }
         return true;
     } catch (error) {
         console.log(error);
