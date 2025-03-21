@@ -11,7 +11,7 @@
             class="lg:w-1/3 sm:w-full md:w-1/2 p-4"
             style="flex-grow-1 flex-basis: auto;"
         >
-            <Notecard id={index} bind:note></Notecard>
+            <Notecard bind:note></Notecard>
         </div>
     {/each}
 </div>

@@ -5,7 +5,7 @@
 	import { deleteNote } from "$lib/dbDal";
 	import { Trash2, Pencil } from "lucide-svelte";
 
-	let { note = $bindable(), id = $bindable() } = $props<{
+	let { note = $bindable(), id = $bindable(0) } = $props<{
 		note: Note;
 		id: number;
 	}>();
