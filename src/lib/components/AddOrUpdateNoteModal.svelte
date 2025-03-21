@@ -8,7 +8,6 @@
 		title: "",
 		content: "",
 		createdDate: new Date(),
-		dueDate: new Date(),
 	};
 	type NoteProps = {
 		note?: Note;
@@ -24,12 +23,21 @@
 	let note = $state(_note);
 
 	let success = $state(false);
+	let errorMessage = $state<string>("");
 
 	async function handleSubmit() {
+		errorMessage = "";
 		// if the note is already in the db, do not change the created date
-		var createdDate: Date = new Date();
+		var createdDate: Date;
 		if (note?.id && note.createdDate) {
 			createdDate = note.createdDate;
+		} else {
+			createdDate = new Date();
+		}
+		note.createdDate = createdDate;
+		if (!note.title) {
+			errorMessage = "Please add a title to your note";
+			return;
 		}
 		const newNote: Note = {
 			...note,
@@ -80,6 +88,9 @@
 
 				<Button onclick={handleSubmit}>Submit</Button>
 			</div>
+			{#if errorMessage}
+				<p class="text-red-300">{errorMessage}</p>
+			{/if}
 		</div>
 	</div>
 {/if}

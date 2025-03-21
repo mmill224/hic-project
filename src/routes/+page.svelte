@@ -58,6 +58,14 @@
 					? new Date(filterDueEndDate)
 					: null;
 
+				// if there's an end date, we want the entire day to be inclusive
+				if (createdEndDate) {
+					createdEndDate.setHours(23, 59, 59, 999); // Set to 11:59:59 PM
+				}
+				if (dueEndDate) {
+					dueEndDate.setHours(23, 59, 59, 999); // Set to 11:59:59 PM
+				}
+
 				return (
 					note.title
 						.toLowerCase()

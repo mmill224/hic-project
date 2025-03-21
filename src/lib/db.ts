@@ -11,10 +11,10 @@ export interface Tag {
 
 export interface Note {
     id?: number;
-    title: string | undefined;
-    content: string | undefined;
-    dueDate: Date | undefined;
-    createdDate: Date | undefined;
+    title?: string;
+    content?: string;
+    dueDate?: Date;
+    createdDate?: Date;
 }
 
 export class MyAppDatabase extends Dexie {
