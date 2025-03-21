@@ -6,14 +6,15 @@
 	import { Trash2, Pencil } from "lucide-svelte";
 	import { onMount } from "svelte";
 
-	export let note: Note | undefined = undefined;
-	export let id = 0;
+	let { note = $bindable(undefined), id = 0 } = $props<{
+		note: Note | undefined;
+	}>();
 
-	let expandTitle = false;
-	let expandContent = false;
+	let expandTitle = $state(false);
+	let expandContent = $state(false);
 
-	let dueDateString = "";
-	let createdDateString = "";
+	let dueDateString = $state("");
+	let createdDateString = $state("");
 
 	let handleDeleteClick = async () => {
 		var success = await deleteNote(note);
@@ -46,7 +47,7 @@
 		}
 	});
 
-	let editMode = false;
+	let editMode = $state(false);
 </script>
 
 <div id="container{id}" class="rounded bg-gray-600 shadow-md">
