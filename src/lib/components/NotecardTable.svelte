@@ -5,8 +5,13 @@
     export let notes: Note[] = [];
 </script>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:grid-cols-3">
-    {#each notes as note}
-        <Notecard bind:note></Notecard>
+<div class="flex flex-col lg:flex-row lg:flex-wrap md:flex-row md:flex-wrap">
+    {#each notes as note, index (note)}
+        <div
+            class="lg:w-1/3 sm:w-full md:w-1/2 p-4"
+            style="flex-grow-1 flex-basis: auto;"
+        >
+            <Notecard bind:note id={index}></Notecard>
+        </div>
     {/each}
 </div>
