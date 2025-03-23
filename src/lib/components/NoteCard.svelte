@@ -52,16 +52,14 @@
 <div id="container{id}" class="rounded bg-gray-600 shadow-md">
 	<div id="header" class="p-4">
 		<div class="flex justify-between">
-			<!-- svelte-ignore a11y_click_events_have_key_events -->
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div
+			<button
 				onclick={() => (expandTitle = !expandTitle)}
 				class="text-2xl font-bold text-left cursor-pointer {expandTitle
-					? ''
+					? 'break-all'
 					: 'overflow-hidden line-clamp-2'}"
 			>
 				{note?.title ?? "No title available"}
-			</div>
+			</button>
 			<MiniButton color={"red"} onclick={handleDeleteClick}
 				><Trash2 /></MiniButton
 			>
@@ -75,18 +73,16 @@
 			</p>
 		</div>
 	</div>
-	<!-- svelte-ignore a11y_click_events_have_key_events -->
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div
+	<button
 		id="body"
 		onclick={() => (expandContent = !expandContent)}
 		class="bg-gray-500 p-4 text-left w-full {expandContent
-			? ''
+			? 'break-all'
 			: 'overflow-hidden line-clamp-5'}"
 		style="white-space: pre-wrap;"
 	>
 		{note?.content ?? "No Content"}
-	</div>
+	</button>
 	<div id="footer" class="flex justify-between p-4 h-20">
 		<div id="tags" class="flex">
 			<p>A tag array would go here</p>
