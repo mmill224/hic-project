@@ -4,29 +4,51 @@
 	import type { Note } from "$lib/db";
 	import { addOrUpdateNote } from "$lib/dbDal";
 
-	export let note: Note = {
+	const DEFAULT_NOTE: Note = {
 		title: "",
 		content: "",
 		createdDate: new Date(),
-		dueDate: undefined,
+	};
+	type NoteProps = {
+		note?: Note;
+		open: boolean;
+		onupdate?: (note: Note) => void;
 	};
 
-	export let open = false;
+	let {
+		onupdate,
+		open = $bindable(false),
+		note: _note = { ...DEFAULT_NOTE },
+	}: NoteProps = $props();
+	let note = $state(_note);
 
-	let success = false;
+	let success = $state(false);
+	let errorMessage = $state<string>("");
 
 	async function handleSubmit() {
+		errorMessage = "";
 		// if the note is already in the db, do not change the created date
-		var createdDate: Date = new Date();
+		var createdDate: Date;
 		if (note?.id && note.createdDate) {
 			createdDate = note.createdDate;
+		} else {
+			createdDate = new Date();
 		}
+		note.createdDate = createdDate;
+		if (!note.title) {
+			errorMessage = "Please add a title to your note";
+			return;
+		}
+		const newNote: Note = {
+			...note,
+		};
 
-		success = await addOrUpdateNote(note);
+		success = await addOrUpdateNote(newNote);
 
 		if (success) {
 			open = false;
 		}
+		onupdate && onupdate(newNote);
 	}
 </script>
 
@@ -50,7 +72,14 @@
 			<div class="flex justify-between">
 				<div class="flex">
 					<input
-						bind:value={note.dueDate}
+						oninput={(e) => {
+							note.dueDate = new Date();
+							const tempDate = e.currentTarget.value.split("-");
+							note.dueDate.setFullYear(parseInt(tempDate[0]));
+							note.dueDate.setMonth(parseInt(tempDate[1]) - 1);
+							note.dueDate.setDate(parseInt(tempDate[2]));
+						}}
+						value={note.dueDate?.toISOString().split("T")[0]}
 						type="date"
 						id="date"
 						class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -59,6 +88,9 @@
 
 				<Button onclick={handleSubmit}>Submit</Button>
 			</div>
+			{#if errorMessage}
+				<p class="text-red-300">{errorMessage}</p>
+			{/if}
 		</div>
 	</div>
 {/if}

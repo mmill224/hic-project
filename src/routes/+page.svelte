@@ -105,13 +105,24 @@
 		{#if showMoreFilters}
 			<div class="flex justify-between">
 				<div class="mx-1">
-					<label for="filterCreatedStartDate" class="text-left block"
+					<label for="filterDueStartDate" class="text-left block"
 						>Due From Date:</label
 					>
 					<input
-						bind:value={filterDueStartDate}
+						oninput={(e) => {
+							filterDueStartDate = new Date();
+							const tempDate = e.currentTarget.value.split("-");
+							filterDueStartDate.setFullYear(
+								parseInt(tempDate[0]),
+							);
+							filterDueStartDate.setMonth(
+								parseInt(tempDate[1]) - 1,
+							);
+							filterDueStartDate.setDate(parseInt(tempDate[2]));
+						}}
+						value={filterDueStartDate?.toISOString().split("T")[0]}
 						type="date"
-						id="filterCreatedStartDate"
+						id="filterDueStartDate"
 						class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
 					/>
 				</div>
@@ -120,9 +131,18 @@
 						>To Date:</label
 					>
 					<input
-						bind:value={filterDueEndDate}
+						oninput={(e) => {
+							filterDueEndDate = new Date();
+							const tempDate = e.currentTarget.value.split("-");
+							filterDueEndDate.setFullYear(parseInt(tempDate[0]));
+							filterDueEndDate.setMonth(
+								parseInt(tempDate[1]) - 1,
+							);
+							filterDueEndDate.setDate(parseInt(tempDate[2]));
+						}}
+						value={filterDueEndDate?.toISOString().split("T")[0]}
 						type="date"
-						id="filterCreatedEndDate"
+						id="filterDueEndDate"
 						class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
 					/>
 				</div>
@@ -132,7 +152,22 @@
 						>Created From Date:</label
 					>
 					<input
-						bind:value={filterCreatedStartDate}
+						oninput={(e) => {
+							filterCreatedStartDate = new Date();
+							const tempDate = e.currentTarget.value.split("-");
+							filterCreatedStartDate.setFullYear(
+								parseInt(tempDate[0]),
+							);
+							filterCreatedStartDate.setMonth(
+								parseInt(tempDate[1]) - 1,
+							);
+							filterCreatedStartDate.setDate(
+								parseInt(tempDate[2]),
+							);
+						}}
+						value={filterCreatedStartDate
+							?.toISOString()
+							.split("T")[0]}
 						type="date"
 						id="filterCreatedStartDate"
 						class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -143,7 +178,20 @@
 						>To Date:</label
 					>
 					<input
-						bind:value={filterCreatedEndDate}
+						oninput={(e) => {
+							filterCreatedEndDate = new Date();
+							const tempDate = e.currentTarget.value.split("-");
+							filterCreatedEndDate.setFullYear(
+								parseInt(tempDate[0]),
+							);
+							filterCreatedEndDate.setMonth(
+								parseInt(tempDate[1]) - 1,
+							);
+							filterCreatedEndDate.setDate(parseInt(tempDate[2]));
+						}}
+						value={filterCreatedEndDate
+							?.toISOString()
+							.split("T")[0]}
 						type="date"
 						id="filterCreatedEndDate"
 						class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
