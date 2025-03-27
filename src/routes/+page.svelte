@@ -20,7 +20,6 @@
 	let dbNotes: Observable<Note[]> = liveQuery(() =>
 		db.notes.limit(100).toArray(),
 	);
-	let displayedNotes: Note[] = $state([]);
 
 	let clearFilters = () => {
 		filterCreatedStartDate = undefined;
@@ -30,9 +29,8 @@
 		searchTerm = "";
 	};
 
-	// change to $derived()
-	$effect(() => {
-		displayedNotes = $dbNotes
+	let arrangeDisplayedNotes = $derived(() => {
+		var result = $dbNotes
 			?.filter((note) => {
 				if (!note.title) {
 					return false;
@@ -82,6 +80,7 @@
 				const bDate = b.createdDate ? new Date(b.createdDate) : null;
 				return bDate && aDate && bDate > aDate ? 1 : -1;
 			});
+		return result;
 	});
 </script>
 
@@ -183,7 +182,7 @@
 			</div>
 		</div>
 	</div>
-	<NotecardTable notes={displayedNotes}></NotecardTable>
+	<NotecardTable notes={arrangeDisplayedNotes()}></NotecardTable>
 </div>
 
 <AddOrUpdateNote bind:open={openModal}></AddOrUpdateNote>
