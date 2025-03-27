@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Note, Tag } from "$lib/db";
 	import MiniButton from "./MiniButton.svelte";
-	import AddOrUpdateNoteModal from "./AddOrUpdateNoteModal.svelte";
+	import AddOrUpdateNote from "./AddOrUpdateNote.svelte";
 	import { deleteNote } from "$lib/dbDal";
 	import { Trash2, Pencil } from "lucide-svelte";
 
@@ -94,12 +94,10 @@
 	</div>
 </div>
 
-{#if editMode}
-	<AddOrUpdateNoteModal
-		{note}
-		bind:open={editMode}
-		onupdate={(newNote: Note) => {
-			note = newNote;
-		}}
-	></AddOrUpdateNoteModal>
-{/if}
+<AddOrUpdateNote
+	{note}
+	bind:open={editMode}
+	onupdate={(newNote: Note) => {
+		note = newNote;
+	}}
+></AddOrUpdateNote>
