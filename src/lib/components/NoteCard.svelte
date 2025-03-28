@@ -82,7 +82,7 @@
 		editable={false}
 		class="
 			note-content
-			bg-gray-500 text-left w-full grow h-fit
+			bg-gray-500 p-4 text-left w-full grow h-full overflow-hidden
 			{expandContent ? 'break-all' : 'overflow-hidden line-clamp-5'}
 		"
 	/>
