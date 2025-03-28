@@ -1,8 +1,11 @@
 <script lang="ts">
 	import TextInput from "./TextInput.svelte";
 	import Button from "./Button.svelte";
-	import type { Note } from "$lib/db";
+	import { db, type Note } from "$lib/db";
 	import { addOrUpdateNote } from "$lib/dbDal";
+	import TipTap from "./TipTap.svelte";
+	import { debounce } from "$lib/utils";
+	import { Editor } from "@tiptap/core";
 
 	const DEFAULT_NOTE: Note = {
 		title: "",
@@ -25,8 +28,10 @@
 	let success = $state(false);
 	let errorMessage = $state<string>("");
 
+	let editor = $state<Editor>();
 	async function handleSubmit() {
 		errorMessage = "";
+		const content = editor?.getHTML();
 		// if the note is already in the db, do not change the created date
 		var createdDate: Date;
 		if (note?.id && note.createdDate) {
@@ -35,30 +40,33 @@
 			createdDate = new Date();
 		}
 		note.createdDate = createdDate;
+		note.content = content;
 		if (!note.title) {
 			errorMessage = "Please add a title to your note";
 			return;
 		}
-		const newNote: Note = {
-			...note,
-		};
 
-		success = await addOrUpdateNote(newNote);
+		success = await addOrUpdateNote({ ...note });
 
 		if (success) {
 			open = false;
 		}
-		onupdate && onupdate(newNote);
+		onupdate && onupdate(note);
 	}
+	const saveNote = debounce((editor: Editor) => {
+		db.notes.update(note, { content: editor.getHTML() });
+	}, 1000);
 </script>
 
 {#if open}
 	<div
-		class="fixed inset-0 flex items-center justify-center"
+		class="fixed inset-0 flex items-center justify-center z-100"
 		style="background-color: rgba(0,0,0,.5)"
 	>
 		<!-- Modal content -->
-		<div class="w-full max-w-sm rounded-lg bg-gray-600 p-6 shadow-lg">
+		<div
+			class="w-[90%] h-[90%] lg:w-[800px] rounded-lg bg-gray-600 p-6 shadow-lg max-h-full overflow-hidden flex flex-col"
+		>
 			<div class="mb-4 flex justify-between text-xl font-semibold">
 				<h2 class="">Edit note</h2>
 				<button onclick={() => (open = !open)} class="cursor-pointer"
@@ -66,8 +74,11 @@
 				>
 			</div>
 			<TextInput label="Title" bind:value={note.title}></TextInput>
-			<TextInput type="textarea" label="Content" bind:value={note.content}
-			></TextInput>
+			<TipTap
+				content={note.content ?? ""}
+				onupdate={saveNote}
+				bind:editor
+			/>
 
 			<div class="flex justify-between">
 				<div class="flex">

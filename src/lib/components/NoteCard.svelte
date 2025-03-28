@@ -1,9 +1,10 @@
 <script lang="ts">
-	import type { Note, Tag } from "$lib/db";
+	import type { Note } from "$lib/db";
 	import MiniButton from "./MiniButton.svelte";
 	import AddOrUpdateNoteModal from "./AddOrUpdateNoteModal.svelte";
 	import { deleteNote } from "$lib/dbDal";
 	import { Trash2, Pencil } from "lucide-svelte";
+	import TipTap from "./TipTap.svelte";
 
 	let { note = $bindable(), id = $bindable(0) } = $props<{
 		note: Note;
@@ -24,7 +25,6 @@
 			alert("Failed to delete note");
 		}
 	};
-
 	$effect(() => {
 		if (note?.dueDate) {
 			dueDateString =
@@ -50,7 +50,10 @@
 	let editMode = $state(false);
 </script>
 
-<div id="container{id}" class="rounded bg-gray-600 shadow-md">
+<div
+	id="container{id}"
+	class="rounded bg-gray-600 shadow-md h-full flex flex-col"
+>
 	<div id="header" class="p-4">
 		<div class="flex justify-between">
 			<button
@@ -74,16 +77,15 @@
 			</p>
 		</div>
 	</div>
-	<button
-		id="body"
-		onclick={() => (expandContent = !expandContent)}
-		class="bg-gray-500 p-4 text-left w-full {expandContent
-			? 'break-all'
-			: 'overflow-hidden line-clamp-5'}"
-		style="white-space: pre-wrap;"
-	>
-		{note?.content ?? "No Content"}
-	</button>
+	<TipTap
+		content={note.content}
+		editable={false}
+		class="
+			note-content
+			bg-gray-500 p-4 text-left w-full grow h-full overflow-hidden
+			{expandContent ? 'break-all' : 'overflow-hidden line-clamp-5'}
+		"
+	/>
 	<div id="footer" class="flex justify-between p-4 h-20">
 		<div id="tags" class="flex">
 			<p>A tag array would go here</p>
@@ -99,7 +101,7 @@
 		{note}
 		bind:open={editMode}
 		onupdate={(newNote: Note) => {
-			note = newNote;
+			note = { ...newNote };
 		}}
 	></AddOrUpdateNoteModal>
 {/if}
