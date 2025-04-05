@@ -2,13 +2,13 @@
 	import { db } from "$lib/db";
 	import NotecardTable from "$lib/components/NotecardTable.svelte";
 	import Button from "$lib/components/Button.svelte";
-	import AddOrUpdateNoteModal from "$lib/components/AddOrUpdateNoteModal.svelte";
+	import AddOrUpdateNote from "$lib/components/AddOrUpdateNote.svelte";
 	import { liveQuery, type Observable } from "dexie";
 	import type { Note } from "$lib/db";
 	import { FunnelX } from "lucide-svelte";
 	import MiniButton from "$lib/components/MiniButton.svelte";
 
-	let addNoteModal = $state(false);
+	let openModal: boolean = $state(false);
 	let searchTerm = $state("");
 
 	let filterCreatedStartDate: Date | undefined = $state(undefined);
@@ -17,12 +17,9 @@
 	let filterDueStartDate: Date | undefined = $state(undefined);
 	let filterDueEndDate: Date | undefined = $state(undefined);
 
-	let showMoreFilters = $state(true);
-
 	let dbNotes: Observable<Note[]> = liveQuery(() =>
 		db.notes.limit(100).toArray(),
 	);
-	let displayedNotes: Note[] = $state([]);
 
 	let clearFilters = () => {
 		filterCreatedStartDate = undefined;
@@ -32,8 +29,8 @@
 		searchTerm = "";
 	};
 
-	$effect(() => {
-		displayedNotes = $dbNotes
+	let arrangeDisplayedNotes = $derived(() => {
+		var result = $dbNotes
 			?.filter((note) => {
 				if (!note.title) {
 					return false;
@@ -83,6 +80,7 @@
 				const bDate = b.createdDate ? new Date(b.createdDate) : null;
 				return bDate && aDate && bDate > aDate ? 1 : -1;
 			});
+		return result;
 	});
 </script>
 
@@ -94,115 +92,97 @@
 			placeholder="Search"
 			class="w-full rounded-lg bg-gray-800 border border-gray-300 bg-text-gray-100 focus:border-transparent focus:ring-2 focus:ring-white focus:outline-none"
 		/>
-		<Button classes="w-50 ml-2" onclick={() => (addNoteModal = true)}
-			>Add Note</Button
+		<Button classes="w-50 ml-2" onclick={() => (openModal = !openModal)}
+			>New Note</Button
 		>
 	</div>
-	<div class="flex justify-between">
+	<div class="hidden sm:flex justify-between">
 		<MiniButton classes="flex" color="blue" onclick={clearFilters}
 			><FunnelX />Clear Filters</MiniButton
 		>
-		{#if showMoreFilters}
-			<div class="flex justify-between">
-				<div class="mx-1">
-					<label for="filterDueStartDate" class="text-left block"
-						>Due From Date:</label
-					>
-					<input
-						oninput={(e) => {
-							filterDueStartDate = new Date();
-							const tempDate = e.currentTarget.value.split("-");
-							filterDueStartDate.setFullYear(
-								parseInt(tempDate[0]),
-							);
-							filterDueStartDate.setMonth(
-								parseInt(tempDate[1]) - 1,
-							);
-							filterDueStartDate.setDate(parseInt(tempDate[2]));
-						}}
-						value={filterDueStartDate?.toISOString().split("T")[0]}
-						type="date"
-						id="filterDueStartDate"
-						class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-					/>
-				</div>
-				<div class="mx-1">
-					<label for="filterCreatedEndDate" class="text-left block"
-						>To Date:</label
-					>
-					<input
-						oninput={(e) => {
-							filterDueEndDate = new Date();
-							const tempDate = e.currentTarget.value.split("-");
-							filterDueEndDate.setFullYear(parseInt(tempDate[0]));
-							filterDueEndDate.setMonth(
-								parseInt(tempDate[1]) - 1,
-							);
-							filterDueEndDate.setDate(parseInt(tempDate[2]));
-						}}
-						value={filterDueEndDate?.toISOString().split("T")[0]}
-						type="date"
-						id="filterDueEndDate"
-						class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-					/>
-				</div>
-
-				<div class="mx-1">
-					<label for="filterCreatedStartDate" class="text-left block"
-						>Created From Date:</label
-					>
-					<input
-						oninput={(e) => {
-							filterCreatedStartDate = new Date();
-							const tempDate = e.currentTarget.value.split("-");
-							filterCreatedStartDate.setFullYear(
-								parseInt(tempDate[0]),
-							);
-							filterCreatedStartDate.setMonth(
-								parseInt(tempDate[1]) - 1,
-							);
-							filterCreatedStartDate.setDate(
-								parseInt(tempDate[2]),
-							);
-						}}
-						value={filterCreatedStartDate
-							?.toISOString()
-							.split("T")[0]}
-						type="date"
-						id="filterCreatedStartDate"
-						class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-					/>
-				</div>
-				<div class="mx-1">
-					<label for="filterCreatedEndDate" class="text-left block"
-						>To Date:</label
-					>
-					<input
-						oninput={(e) => {
-							filterCreatedEndDate = new Date();
-							const tempDate = e.currentTarget.value.split("-");
-							filterCreatedEndDate.setFullYear(
-								parseInt(tempDate[0]),
-							);
-							filterCreatedEndDate.setMonth(
-								parseInt(tempDate[1]) - 1,
-							);
-							filterCreatedEndDate.setDate(parseInt(tempDate[2]));
-						}}
-						value={filterCreatedEndDate
-							?.toISOString()
-							.split("T")[0]}
-						type="date"
-						id="filterCreatedEndDate"
-						class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-					/>
-				</div>
+		<div class="flex justify-between">
+			<div class="mx-1">
+				<label for="filterDueStartDate" class="text-left block"
+					>Due From Date:</label
+				>
+				<input
+					oninput={(e) => {
+						filterDueStartDate = new Date();
+						const tempDate = e.currentTarget.value.split("-");
+						filterDueStartDate.setFullYear(parseInt(tempDate[0]));
+						filterDueStartDate.setMonth(parseInt(tempDate[1]) - 1);
+						filterDueStartDate.setDate(parseInt(tempDate[2]));
+					}}
+					value={filterDueStartDate?.toISOString().split("T")[0]}
+					type="date"
+					id="filterDueStartDate"
+					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+				/>
 			</div>
-		{/if}
+			<div class="mx-1">
+				<label for="filterCreatedEndDate" class="text-left block"
+					>To Date:</label
+				>
+				<input
+					oninput={(e) => {
+						filterDueEndDate = new Date();
+						const tempDate = e.currentTarget.value.split("-");
+						filterDueEndDate.setFullYear(parseInt(tempDate[0]));
+						filterDueEndDate.setMonth(parseInt(tempDate[1]) - 1);
+						filterDueEndDate.setDate(parseInt(tempDate[2]));
+					}}
+					value={filterDueEndDate?.toISOString().split("T")[0]}
+					type="date"
+					id="filterDueEndDate"
+					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+				/>
+			</div>
+
+			<div class="mx-1">
+				<label for="filterCreatedStartDate" class="text-left block"
+					>Created From Date:</label
+				>
+				<input
+					oninput={(e) => {
+						filterCreatedStartDate = new Date();
+						const tempDate = e.currentTarget.value.split("-");
+						filterCreatedStartDate.setFullYear(
+							parseInt(tempDate[0]),
+						);
+						filterCreatedStartDate.setMonth(
+							parseInt(tempDate[1]) - 1,
+						);
+						filterCreatedStartDate.setDate(parseInt(tempDate[2]));
+					}}
+					value={filterCreatedStartDate?.toISOString().split("T")[0]}
+					type="date"
+					id="filterCreatedStartDate"
+					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+				/>
+			</div>
+			<div class="mx-1">
+				<label for="filterCreatedEndDate" class="text-left block"
+					>To Date:</label
+				>
+				<input
+					oninput={(e) => {
+						filterCreatedEndDate = new Date();
+						const tempDate = e.currentTarget.value.split("-");
+						filterCreatedEndDate.setFullYear(parseInt(tempDate[0]));
+						filterCreatedEndDate.setMonth(
+							parseInt(tempDate[1]) - 1,
+						);
+						filterCreatedEndDate.setDate(parseInt(tempDate[2]));
+					}}
+					value={filterCreatedEndDate?.toISOString().split("T")[0]}
+					type="date"
+					id="filterCreatedEndDate"
+					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+				/>
+			</div>
+		</div>
 	</div>
-	<NotecardTable notes={displayedNotes}></NotecardTable>
+	<NotecardTable notes={arrangeDisplayedNotes()}></NotecardTable>
 </div>
 
-{#if addNoteModal}
-	<AddOrUpdateNoteModal bind:open={addNoteModal}></AddOrUpdateNoteModal>
-{/if}
+<AddOrUpdateNote bind:open={openModal}></AddOrUpdateNote>
