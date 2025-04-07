@@ -187,9 +187,6 @@
 	<NotecardTable notes={arrangeDisplayedNotes()}></NotecardTable>
 </div>
 
-{#if addNoteModal}
-	<AddOrUpdateNoteModal bind:open={addNoteModal}></AddOrUpdateNoteModal>
-{/if}
 <AddOrUpdateNote bind:open={openModal}></AddOrUpdateNote>
 
 <HotKeys />
