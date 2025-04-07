@@ -8,6 +8,11 @@
       // focus search bar
       document.getElementById("search-bar")?.focus();
     }
+    if (event.altKey && event.key == "n") {
+      event.preventDefault();
+      const el = document.querySelector('.New-Note-Button') as HTMLElement;
+      el?.click();
+    }
     //other hotkeys here
   }
 
