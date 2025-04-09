@@ -96,7 +96,7 @@
 			placeholder="Search"
 			class="w-full rounded-lg bg-gray-800 border border-gray-300 bg-text-gray-100 focus:border-transparent focus:ring-2 focus:ring-white focus:outline-none"
 		/>
-		<Button classes="w-50 ml-2" onclick={() => (addNoteModal = true)}
+		<Button classes="w-50 ml-2 New-Note-Button" onclick={() => (addNoteModal = true)}
 			>Add Note</Button
 		>
 	</div>
