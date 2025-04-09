@@ -8,6 +8,7 @@
 	import { FunnelX } from "lucide-svelte";
 	import MiniButton from "$lib/components/MiniButton.svelte";
 	import HotKeys from "$lib/utils/HotKeys.svelte";
+	import { addOrUpdateNote } from "$lib/dbDal";
 
 	let openModal: boolean = $state(false);
 	let searchTerm = $state("");
@@ -48,7 +49,9 @@
 					? new Date(filterCreatedEndDate)
 					: null;
 
-				const dueDate = note.dueDate ? new Date(note.dueDate) : null;
+				const dueDate = note.dueDate
+					? new Date(note.dueDate)
+					: null;
 				const dueStartDate = filterDueStartDate
 					? new Date(filterDueStartDate)
 					: null;
@@ -58,7 +61,12 @@
 
 				// if there's an end date, we want the entire day to be inclusive
 				if (createdEndDate) {
-					createdEndDate.setHours(23, 59, 59, 999); // Set to 11:59:59 PM
+					createdEndDate.setHours(
+						23,
+						59,
+						59,
+						999,
+					); // Set to 11:59:59 PM
 				}
 				if (dueEndDate) {
 					dueEndDate.setHours(23, 59, 59, 999); // Set to 11:59:59 PM
@@ -67,18 +75,33 @@
 				return (
 					note.title
 						.toLowerCase()
-						.includes(searchTerm.toLowerCase()) &&
+						.includes(
+							searchTerm.toLowerCase(),
+						) &&
 					(!createdStartDate ||
-						(createdDate && createdDate >= createdStartDate)) &&
+						(createdDate &&
+							createdDate >=
+								createdStartDate)) &&
 					(!createdEndDate ||
-						(createdDate && createdDate <= createdEndDate)) &&
-					(!dueStartDate || (dueDate && dueDate >= dueStartDate)) &&
-					(!dueEndDate || (dueDate && dueDate <= dueEndDate))
+						(createdDate &&
+							createdDate <=
+								createdEndDate)) &&
+					(!dueStartDate ||
+						(dueDate &&
+							dueDate >=
+								dueStartDate)) &&
+					(!dueEndDate ||
+						(dueDate &&
+							dueDate <= dueEndDate))
 				);
 			})
 			.sort((a, b) => {
-				const aDate = a.createdDate ? new Date(a.createdDate) : null;
-				const bDate = b.createdDate ? new Date(b.createdDate) : null;
+				const aDate = a.createdDate
+					? new Date(a.createdDate)
+					: null;
+				const bDate = b.createdDate
+					? new Date(b.createdDate)
+					: null;
 				return bDate && aDate && bDate > aDate ? 1 : -1;
 			});
 		return result;
@@ -96,7 +119,7 @@
 		/>
 		<Button
 			classes="w-50 ml-2 New-Note-Button"
-			onclick={() => (addNoteModal = true)}>Add Note</Button
+			onclick={() => (openModal = true)}>Add Note</Button
 		>
 	</div>
 	<div class="hidden sm:flex justify-between">
@@ -105,36 +128,63 @@
 		>
 		<div class="flex justify-between">
 			<div class="mx-1">
-				<label for="filterDueStartDate" class="text-left block"
+				<label
+					for="filterDueStartDate"
+					class="text-left block"
 					>Due From Date:</label
 				>
 				<input
 					oninput={(e) => {
 						filterDueStartDate = new Date();
-						const tempDate = e.currentTarget.value.split("-");
-						filterDueStartDate.setFullYear(parseInt(tempDate[0]));
-						filterDueStartDate.setMonth(parseInt(tempDate[1]) - 1);
-						filterDueStartDate.setDate(parseInt(tempDate[2]));
+						const tempDate =
+							e.currentTarget.value.split(
+								"-",
+							);
+						filterDueStartDate.setFullYear(
+							parseInt(tempDate[0]),
+						);
+						filterDueStartDate.setMonth(
+							parseInt(tempDate[1]) -
+								1,
+						);
+						filterDueStartDate.setDate(
+							parseInt(tempDate[2]),
+						);
 					}}
-					value={filterDueStartDate?.toISOString().split("T")[0]}
+					value={filterDueStartDate
+						?.toISOString()
+						.split("T")[0]}
 					type="date"
 					id="filterDueStartDate"
 					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
 			</div>
 			<div class="mx-1">
-				<label for="filterCreatedEndDate" class="text-left block"
-					>To Date:</label
+				<label
+					for="filterCreatedEndDate"
+					class="text-left block">To Date:</label
 				>
 				<input
 					oninput={(e) => {
 						filterDueEndDate = new Date();
-						const tempDate = e.currentTarget.value.split("-");
-						filterDueEndDate.setFullYear(parseInt(tempDate[0]));
-						filterDueEndDate.setMonth(parseInt(tempDate[1]) - 1);
-						filterDueEndDate.setDate(parseInt(tempDate[2]));
+						const tempDate =
+							e.currentTarget.value.split(
+								"-",
+							);
+						filterDueEndDate.setFullYear(
+							parseInt(tempDate[0]),
+						);
+						filterDueEndDate.setMonth(
+							parseInt(tempDate[1]) -
+								1,
+						);
+						filterDueEndDate.setDate(
+							parseInt(tempDate[2]),
+						);
 					}}
-					value={filterDueEndDate?.toISOString().split("T")[0]}
+					value={filterDueEndDate
+						?.toISOString()
+						.split("T")[0]}
 					type="date"
 					id="filterDueEndDate"
 					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -142,42 +192,65 @@
 			</div>
 
 			<div class="mx-1">
-				<label for="filterCreatedStartDate" class="text-left block"
+				<label
+					for="filterCreatedStartDate"
+					class="text-left block"
 					>Created From Date:</label
 				>
 				<input
 					oninput={(e) => {
-						filterCreatedStartDate = new Date();
-						const tempDate = e.currentTarget.value.split("-");
+						filterCreatedStartDate =
+							new Date();
+						const tempDate =
+							e.currentTarget.value.split(
+								"-",
+							);
 						filterCreatedStartDate.setFullYear(
 							parseInt(tempDate[0]),
 						);
 						filterCreatedStartDate.setMonth(
-							parseInt(tempDate[1]) - 1,
+							parseInt(tempDate[1]) -
+								1,
 						);
-						filterCreatedStartDate.setDate(parseInt(tempDate[2]));
+						filterCreatedStartDate.setDate(
+							parseInt(tempDate[2]),
+						);
 					}}
-					value={filterCreatedStartDate?.toISOString().split("T")[0]}
+					value={filterCreatedStartDate
+						?.toISOString()
+						.split("T")[0]}
 					type="date"
 					id="filterCreatedStartDate"
 					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
 			</div>
 			<div class="mx-1">
-				<label for="filterCreatedEndDate" class="text-left block"
-					>To Date:</label
+				<label
+					for="filterCreatedEndDate"
+					class="text-left block">To Date:</label
 				>
 				<input
 					oninput={(e) => {
-						filterCreatedEndDate = new Date();
-						const tempDate = e.currentTarget.value.split("-");
-						filterCreatedEndDate.setFullYear(parseInt(tempDate[0]));
-						filterCreatedEndDate.setMonth(
-							parseInt(tempDate[1]) - 1,
+						filterCreatedEndDate =
+							new Date();
+						const tempDate =
+							e.currentTarget.value.split(
+								"-",
+							);
+						filterCreatedEndDate.setFullYear(
+							parseInt(tempDate[0]),
 						);
-						filterCreatedEndDate.setDate(parseInt(tempDate[2]));
+						filterCreatedEndDate.setMonth(
+							parseInt(tempDate[1]) -
+								1,
+						);
+						filterCreatedEndDate.setDate(
+							parseInt(tempDate[2]),
+						);
 					}}
-					value={filterCreatedEndDate?.toISOString().split("T")[0]}
+					value={filterCreatedEndDate
+						?.toISOString()
+						.split("T")[0]}
 					type="date"
 					id="filterCreatedEndDate"
 					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
