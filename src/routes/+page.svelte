@@ -7,6 +7,8 @@
 	import type { Note } from "$lib/db";
 	import { FunnelX } from "lucide-svelte";
 	import MiniButton from "$lib/components/MiniButton.svelte";
+	import HotKeys from "$lib/utils/HotKeys.svelte";
+    import { addOrUpdateNote } from "$lib/dbDal";
 
 	let openModal: boolean = $state(false);
 	let searchTerm = $state("");
@@ -87,13 +89,14 @@
 <div class="mx-auto text-center w-300 m-5">
 	<div class="flex justify-between py-4">
 		<input
+			id="search-bar"
 			type="search"
 			bind:value={searchTerm}
 			placeholder="Search"
 			class="w-full rounded-lg bg-gray-800 border border-gray-300 bg-text-gray-100 focus:border-transparent focus:ring-2 focus:ring-white focus:outline-none"
 		/>
-		<Button classes="w-50 ml-2" onclick={() => (openModal = !openModal)}
-			>New Note</Button
+		<Button classes="w-50 ml-2 New-Note-Button" onclick={() => (openModal = true)}
+			>Add Note</Button
 		>
 	</div>
 	<div class="hidden sm:flex justify-between">
@@ -186,3 +189,5 @@
 </div>
 
 <AddOrUpdateNote bind:open={openModal}></AddOrUpdateNote>
+
+<HotKeys />
