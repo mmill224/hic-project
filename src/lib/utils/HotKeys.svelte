@@ -26,7 +26,3 @@
     };
   });
 </script>
-
-<div>
-  <p>Press "Ctrl + S" to trigger the hotkey.</p>
-</div>
