@@ -2,8 +2,9 @@
 	import type { Note, Tag } from "$lib/db";
 	import MiniButton from "./MiniButton.svelte";
 	import AddOrUpdateNote from "./AddOrUpdateNote.svelte";
-	import { deleteNote } from "$lib/dbDal";
+	import { deleteNote, getTagsForNote } from "$lib/dbDal";
 	import { Trash2, Pencil } from "lucide-svelte";
+	import { db } from "$lib/db";
 
 	let { note = $bindable(), id = $bindable(0) } = $props<{
 		note: Note;
@@ -48,6 +49,27 @@
 	});
 
 	let editMode = $state(false);
+	let tags = $state<Tag[]>([]);
+
+	async function getTags() {
+		if (note?.id) {
+			// 1. Fetch NoteTagRelation entries
+			const relations = await db.noteTagRelation
+				.where("noteId")
+				.equals(note.id)
+				.toArray();
+
+			// 2. Extract tagId values
+			const tagIds = relations.map((relation) => relation.tagId);
+
+			// 3. Fetch Tags
+			tags = await db.tags.where("id").anyOf(tagIds).toArray();
+		}
+	}
+
+	$effect(() => {
+		getTags();
+	});
 </script>
 
 <div id="container{id}" class="rounded bg-gray-600 shadow-md">
@@ -86,7 +108,9 @@
 	</button>
 	<div id="footer" class="flex justify-between p-4 h-20">
 		<div id="tags" class="flex">
-			<p>A tag array would go here</p>
+			{#each tags as tag}
+				<p class="mr-2 bg-gray-700 rounded px-2 py-1 text-sm">{tag.name}</p>
+			{/each}
 		</div>
 		<MiniButton onclick={() => (editMode = !editMode)}
 			><Pencil /></MiniButton
