@@ -18,12 +18,17 @@
 	let createdDateString = $state("");
 
 	let handleDeleteClick = async () => {
+		// Delete relationships to tags from the relationship table
+		if (note?.id) {
+			await db.noteTagRelation.where("noteId").equals(note.id).delete();
+		}
 		var success = await deleteNote(note);
 		if (success) {
 			return;
 		} else {
 			alert("Failed to delete note");
 		}
+
 	};
 
 	$effect(() => {
@@ -53,17 +58,9 @@
 
 	async function getTags() {
 		if (note?.id) {
-			// 1. Fetch NoteTagRelation entries
-			const relations = await db.noteTagRelation
-				.where("noteId")
-				.equals(note.id)
-				.toArray();
-
-			// 2. Extract tagId values
-			const tagIds = relations.map((relation) => relation.tagId);
-
-			// 3. Fetch Tags
-			tags = await db.tags.where("id").anyOf(tagIds).toArray();
+			tags = await getTagsForNote(note.id);
+		} else {
+			tags = [];
 		}
 	}
 
@@ -109,7 +106,9 @@
 	<div id="footer" class="flex justify-between p-4 h-20">
 		<div id="tags" class="flex">
 			{#each tags as tag}
-				<p class="mr-2 bg-gray-700 rounded px-2 py-1 text-sm">{tag.name}</p>
+				<p class="mr-2 bg-gray-700 rounded px-2 py-1 text-sm h-[2em]">
+					{tag.name}
+				</p>
 			{/each}
 		</div>
 		<MiniButton onclick={() => (editMode = !editMode)}

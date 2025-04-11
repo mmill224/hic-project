@@ -4,7 +4,6 @@ import Dexie from 'dexie';
 // one task may have many tags
 export interface Tag {
     id?: number;
-    noteId: number; // fk to task
     name: string;
     color: string;
 }
@@ -21,6 +20,9 @@ export interface noteTagRelation {
     id?: number;
     tagId?: number; // fk to tag
     noteId?: number; // fk to task
+}
+export function getTags() {
+    return db.tags.toArray();
 }
 
 export class MyAppDatabase extends Dexie {

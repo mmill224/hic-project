@@ -1,15 +1,17 @@
 <script lang="ts">
 	import TextInput from "./TextInput.svelte";
 	import Button from "./Button.svelte";
-	import type { Note } from "$lib/db";
+	import type { Note, Tag, noteTagRelation } from "$lib/db";
 	import { addOrUpdateNote } from "$lib/dbDal";
 	import Modal from "./Modal.svelte";
+	import { db } from "$lib/db"; // Import the database instance
 
 	const DEFAULT_NOTE: Note = {
 		title: "",
 		content: "",
 		createdDate: new Date(),
 	};
+
 	type NoteProps = {
 		note?: Note;
 		open: boolean;
@@ -25,10 +27,29 @@
 
 	let success = $state(false);
 	let errorMessage = $state<string>("");
+	let tags = $state<string[]>([""]); // Initialize with one empty input
+
+	// Fetch tags when the modal is opened
+	$effect(() => {
+		if (open && note?.id) {
+			loadTagsForNote();
+		}
+	});
+
+	async function loadTagsForNote() {
+		if (note?.id) {
+			const relations = await db.noteTagRelation.where("noteId").equals(note.id).toArray();
+			const tagIds = relations.map((relation) => relation.tagId).filter((id): id is number => id !== undefined);
+			const existingTags = await db.tags.where("id").anyOf(tagIds).toArray();
+			tags = existingTags.map((tag) => tag.name); // Populate tags with tag names
+			tags = [...tags, ""]; // Add an empty input for new tags
+		}
+	}
 
 	async function handleSubmit() {
 		errorMessage = "";
-		// if the note is already in the db, do not change the created date
+
+		// If the note is already in the db, do not change the created date
 		var createdDate: Date;
 		if (note?.id && note.createdDate) {
 			createdDate = note.createdDate;
@@ -36,10 +57,13 @@
 			createdDate = new Date();
 		}
 		note.createdDate = createdDate;
+
 		if (!note.title) {
 			errorMessage = "Please add a title to your note";
 			return;
 		}
+
+		// Add the note to the database
 		const newNote: Note = {
 			...note,
 		};
@@ -47,10 +71,58 @@
 		success = await addOrUpdateNote(newNote);
 
 		if (success) {
+			// Get the note ID (if it's a new note, the ID will be generated)
+			const noteId = newNote.id;
+
+			if (!noteId) {
+				errorMessage = "Failed to save the note. Please try again.";
+				return;
+			}
+
+			// Process tags
+			const uniqueTags = tags.filter((tag) => tag.trim() !== ""); // Remove empty tags
+			for (const tagName of uniqueTags) {
+				// Check if the tag already exists
+				let tag = await db.tags.where("name").equals(tagName).first();
+
+				if (!tag) {
+					// If the tag doesn't exist, add it to the tags table
+					const tagId = await db.tags.add({ name: tagName, color: "#000000" });
+					tag = { id: tagId, name: tagName, color: "#000000" };
+				}
+
+				if (!tag?.id) {
+					errorMessage = `Failed to save the tag "${tagName}". Please try again.`;
+					continue;
+				}
+
+				// Check if the relation already exists
+				const relationExists = await db.noteTagRelation
+					.where({ noteId, tagId: tag.id })
+					.first();
+
+				if (!relationExists) {
+					// Add the relation to the noteTagRelation table
+					await db.noteTagRelation.add({ noteId, tagId: tag.id });
+				}
+			}
+
+			// Reset the form
 			open = false;
 			note = { ...DEFAULT_NOTE };
+			tags = [""];
 		}
+
 		onupdate && onupdate(newNote);
+	}
+
+	function handleTagInput(index: number, value: string) {
+		tags[index] = value;
+
+		// Add a new input field if the last one is being edited
+		if (index === tags.length - 1 && value.trim() !== "") {
+			tags = [...tags, ""];
+		}
 	}
 </script>
 
@@ -63,23 +135,26 @@
 			<div class="text-red-500 m-2">{errorMessage}</div>
 		{/if}
 
-		<div class="flex justify-between">
-			<div class="flex">
-				<input
-					oninput={(e) => {
-						note.dueDate = new Date();
-						const tempDate = e.currentTarget.value.split("-");
-						note.dueDate.setFullYear(parseInt(tempDate[0]));
-						note.dueDate.setMonth(parseInt(tempDate[1]) - 1);
-						note.dueDate.setDate(parseInt(tempDate[2]));
-					}}
-					value={note.dueDate?.toISOString().split("T")[0]}
-					type="date"
-					id="date"
-					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-				/>
+		<div class="mt-4">
+			<h3 class="text-lg font-bold mb-2">Tags</h3>
+			<div class="flex flex-wrap gap-2">
+				{#each tags as tag, index}
+					<div class="mb-2">
+						<input
+							type="text"
+							bind:value={tags[index]}
+							oninput={(e) => handleTagInput(index, e.currentTarget.value)}
+							placeholder="Enter a tag"
+							class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+							style="width: auto; min-width: 50px; padding: 4px;"
+							size={tags[index]?.length || 1}
+						/>
+					</div>
+				{/each}
 			</div>
+		</div>
 
+		<div class="flex justify-between mt-4">
 			<Button onclick={handleSubmit}>Submit</Button>
 		</div>
 	</Modal>

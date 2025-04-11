@@ -1,6 +1,6 @@
 import Dexie from "dexie";
 import { db } from "$lib/db";
-import type { Note, Tag } from "$lib/db";
+import type { Note, Tag, noteTagRelation} from "$lib/db";
 
 export async function addOrUpdateNote(note: Note, tags: Tag[] = []): Promise<boolean> {
     try {
@@ -50,7 +50,9 @@ export async function addTagToDb(tag: Tag): Promise<boolean> {
 
 export async function getTagsForNote(noteId: number): Promise<Tag[]> {
     try {
-        return await db.tags.filter((tag) => { return tag.noteId == noteId }).toArray()
+        const noteTags = await db.noteTagRelation.where("noteId").equals(noteId).toArray();
+        const tagIds = noteTags.map((rel) => rel.tagId).filter((id): id is number => id !== undefined);
+        return await db.tags.where("id").anyOf(tagIds).toArray();
     } catch (error) {
         console.log(error);
         return [];
