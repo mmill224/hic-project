@@ -26,7 +26,6 @@
 	let is_underline = $state<boolean>(false);
 	let can_undo = $state<boolean>(false);
 	let can_redo = $state<boolean>(false);
-	let collapsed = $state<boolean>(true);
 	$effect(() => {
 		if (element) {
 			editor = new Editor({
@@ -36,11 +35,6 @@
 				editable: editable,
 				onUpdate: () => {
 					onupdate && onupdate(editor);
-					if (element && element.clientHeight < 500) {
-						collapsed = false;
-					} else {
-						collapsed = true;
-					}
 				},
 				onTransaction: () => {
 					// force re-render so `editor.isActive` works as expected
@@ -69,10 +63,8 @@
 	role="button"
 	tabindex="0"
 	class={`
-<<<<<<< HEAD
-		note-content
 		${editable && `peer editable`}
-=======
+
 		note-content overflow-y-scroll h-full
 		${
 			editable &&
@@ -82,7 +74,6 @@
 				hover:cursor-pointer
 			`
 		}
->>>>>>> 6f85360 (feat: Markdown Notes)
 		${args.class}
 	`}
 	aria-label="Note Content."
@@ -136,12 +127,6 @@
 			</div>
 		</div>
 	{/if}
-<<<<<<< HEAD
-	{#if collapsed}
-		<div class="bottom-shadow"></div>
-	{/if}
-=======
->>>>>>> 6f85360 (feat: Markdown Notes)
 </div>
 
 <style>
@@ -149,38 +134,6 @@
 		position: relative;
 		display: flex;
 		flex-direction: column;
-<<<<<<< HEAD
-		overflow-y: auto;
-		scrollbar-gutter: stable;
-		height: 300px;
-	}
-
-	.note-content.editable {
-		width: 100%;
-		border: 1px solid var(--color-gray-300);
-		background: var(--color-gray-800);
-		color: var(--color-gray-100);
-		overflow: auto;
-		height: 100%;
-		/*peer w-full rounded-lg border border-gray-300 bg-gray-800 text-gray-100 
-				focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none
-				hover:cursor-pointer*/
-	}
-
-	.bottom-shadow {
-	}
-
-	.note-content::-webkit-scrollbar {
-		width: 10px;
-	}
-
-	.note-content::-webkit-scrollbar-thumb {
-		background: #f1f2f6;
-		border-radius: 50rem;
-		border: 3px solid transparent;
-		background-clip: padding-box;
-=======
->>>>>>> 6f85360 (feat: Markdown Notes)
 	}
 
 	.note-content :global(.tiptap) {
@@ -193,13 +146,8 @@
 		outline: none;
 	}
 
-<<<<<<< HEAD
-	.note-content :global .tiptap {
-		padding: 1rem 1rem;
-=======
 	.note-content :global > * {
 		padding: 1rem 2rem;
->>>>>>> 6f85360 (feat: Markdown Notes)
 	}
 
 	.note-content :global {

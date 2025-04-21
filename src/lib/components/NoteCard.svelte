@@ -90,8 +90,11 @@
 		<div id="tags" class="flex">
 			<p>A tag array would go here</p>
 		</div>
-		<MiniButton onclick={() => (editMode = !editMode)}
-			><Pencil /></MiniButton
+		<MiniButton
+			onclick={(e: MouseEvent) => {
+				e.stopPropagation();
+				editMode = !editMode;
+			}}><Pencil /></MiniButton
 		>
 	</div>
 </div>

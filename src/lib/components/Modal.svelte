@@ -35,6 +35,7 @@
 	const handleEscape = (event: KeyboardEvent) => {
 		if (event.key === "Escape") {
 			open = false;
+			document.body.classList.remove("disable-scroll");
 		}
 	};
 
@@ -42,16 +43,24 @@
 		const container = document.getElementById("modalContainer");
 		if (container && !container.contains(event.target as Node)) {
 			open = !open;
+			if (!open) {
+				document.body.classList.remove("disable-scroll");
+			}
 		}
 	};
 
-	onMount(() => {
+	$effect(() => {
+		if (open) {
+			document.body.classList.add("disable-scroll");
+		} else {
+			document.body.classList.remove("disable-scroll");
+		}
+	});
+
+	$effect(() => {
+		if (!open) return;
 		document.addEventListener("keydown", handleEscape);
-		// without any waiting, clicking a button to open the modal results in this event firing
-		// immediately, causing the modal to close. add a short delay so that doesn't happen.
-		setTimeout(() => {
-			document.addEventListener("click", handleClickOutside);
-		}, 100);
+		document.addEventListener("click", handleClickOutside);
 
 		switch (size) {
 			case "sm":
@@ -67,17 +76,17 @@
 				sizeClass = "w-full h-full";
 				break;
 		}
-	});
-
-	onDestroy(() => {
-		document.removeEventListener("keydown", handleEscape);
-		document.removeEventListener("click", handleClickOutside);
+		return () => {
+			document.removeEventListener("keydown", handleEscape);
+			document.removeEventListener("click", handleClickOutside);
+		};
 	});
 </script>
 
 {#if open}
 	<div
 		class="max-h-screen fixed inset-0 flex items-center justify-center z-100"
+		id="modal-open"
 		style="background-color: rgba(0,0,0,.5)"
 	>
 		<div
