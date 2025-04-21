@@ -34,15 +34,15 @@
 
 	const handleEscape = (event: KeyboardEvent) => {
 		if (event.key === "Escape") {
-			open = false;
-			document.body.classList.remove("disable-scroll");
+			open = false; 
+			document.body.classList.remove("disable-scroll"); 
 		}
 	};
 
 	const handleClickOutside = (event: MouseEvent) => {
 		const container = document.getElementById("modalContainer");
 		if (container && !container.contains(event.target as Node)) {
-			open = !open;
+			open = !open; 
 			if (!open) {
 				document.body.classList.remove("disable-scroll");
 			}
@@ -60,7 +60,7 @@
 	$effect(() => {
 		if (!open) return;
 		document.addEventListener("keydown", handleEscape);
-		document.addEventListener("click", handleClickOutside);
+		document.addEventListener("click", handleClickOutside); 
 
 		switch (size) {
 			case "sm":
@@ -75,16 +75,16 @@
 			case "full":
 				sizeClass = "w-full h-full";
 				break;
-		}
+		} 
 		return () => {
 			document.removeEventListener("keydown", handleEscape);
 			document.removeEventListener("click", handleClickOutside);
-		};
+		}; 
 	});
 </script>
 
 {#if open}
-	<div
+	<div 
 		class="max-h-screen fixed inset-0 flex items-center justify-center z-100"
 		id="modal-open"
 		style="background-color: rgba(0,0,0,.5)"
@@ -92,18 +92,18 @@
 		<div
 			class="{sizeClass} max-h-full overflow-hidden flex flex-col bg-gray-700 p-6 shadow-lg"
 			id="modalContainer"
-		>
+		> 
 			<div
 				class="mb-4 items-center flex justify-between text-xl font-semibold"
 			>
 				<h2 class="">{title}</h2>
 				<MiniButton
 					classes="hover:bg-gray-600"
-					color="white"
+					color="white" 
 					onclick={(e) => {
 						e.preventDefault();
 						open = !open;
-					}}><X /></MiniButton
+					}}><X /></MiniButton 
 				>
 			</div>
 			{@render children()}

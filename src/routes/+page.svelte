@@ -7,8 +7,8 @@
 	import type { Note } from "$lib/db";
 	import { FunnelX } from "lucide-svelte";
 	import MiniButton from "$lib/components/MiniButton.svelte";
-	import HotKeys from "$lib/utils/HotKeys.svelte";
-	import { addOrUpdateNote } from "$lib/dbDal";
+	import HotKeys from "$lib/utils/HotKeys.svelte"; 
+	import { addOrUpdateNote } from "$lib/dbDal"; 
 
 	let openModal: boolean = $state(false);
 	let searchTerm = $state("");
@@ -116,10 +116,10 @@
 			bind:value={searchTerm}
 			placeholder="Search"
 			class="w-full rounded-lg bg-gray-800 border border-gray-300 bg-text-gray-100 focus:border-transparent focus:ring-2 focus:ring-white focus:outline-none"
-		/>
+		/> 
 		<Button
 			classes="w-50 ml-2 New-Note-Button"
-			onclick={() => (openModal = true)}>Add Note</Button
+			onclick={() => (openModal = true)}>Add Note</Button 
 		>
 	</div>
 	<div class="hidden sm:flex justify-between">
@@ -127,139 +127,92 @@
 			><FunnelX />Clear Filters</MiniButton
 		>
 		<div class="flex justify-between">
-			<div class="mx-1">
+			<div class="mx-1"> 
 				<label
 					for="filterDueStartDate"
-					class="text-left block"
+					class="text-left block" 
 					>Due From Date:</label
 				>
 				<input
 					oninput={(e) => {
-						filterDueStartDate = new Date();
-						const tempDate =
-							e.currentTarget.value.split(
-								"-",
-							);
-						filterDueStartDate.setFullYear(
-							parseInt(tempDate[0]),
-						);
-						filterDueStartDate.setMonth(
-							parseInt(tempDate[1]) -
-								1,
-						);
-						filterDueStartDate.setDate(
-							parseInt(tempDate[2]),
-						);
+						filterDueStartDate = new Date(); 
+						const tempDate = e.currentTarget.value.split("-");
+						filterDueStartDate.setFullYear(parseInt(tempDate[0]));
+						filterDueStartDate.setMonth(parseInt(tempDate[1]) - 1);
+						filterDueStartDate.setDate(parseInt(tempDate[2]));
 					}}
-					value={filterDueStartDate
-						?.toISOString()
-						.split("T")[0]}
+					value={filterDueStartDate?.toISOString().split("T")[0]} 
 					type="date"
 					id="filterDueStartDate"
 					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
 			</div>
-			<div class="mx-1">
+			<div class="mx-1"> 
 				<label
 					for="filterCreatedEndDate"
-					class="text-left block">To Date:</label
+					class="text-left block">To Date:</label 
 				>
 				<input
 					oninput={(e) => {
-						filterDueEndDate = new Date();
-						const tempDate =
-							e.currentTarget.value.split(
-								"-",
-							);
-						filterDueEndDate.setFullYear(
-							parseInt(tempDate[0]),
-						);
-						filterDueEndDate.setMonth(
-							parseInt(tempDate[1]) -
-								1,
-						);
-						filterDueEndDate.setDate(
-							parseInt(tempDate[2]),
-						);
+						filterDueEndDate = new Date(); 
+						const tempDate = e.currentTarget.value.split("-");
+						filterDueEndDate.setFullYear(parseInt(tempDate[0]));
+						filterDueEndDate.setMonth(parseInt(tempDate[1]) - 1);
+						filterDueEndDate.setDate(parseInt(tempDate[2]));
 					}}
-					value={filterDueEndDate
-						?.toISOString()
-						.split("T")[0]}
+					value={filterDueEndDate?.toISOString().split("T")[0]} 
 					type="date"
 					id="filterDueEndDate"
 					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
 			</div>
 
-			<div class="mx-1">
-				<label
-					for="filterCreatedStartDate"
-					class="text-left block"
+			<div class="mx-1"> 
+				<label for="filterCreatedStartDate" class="text-left block" 
 					>Created From Date:</label
 				>
 				<input
-					oninput={(e) => {
-						filterCreatedStartDate =
-							new Date();
-						const tempDate =
-							e.currentTarget.value.split(
-								"-",
-							);
+					oninput={(e) => { 
+						filterCreatedStartDate = new Date();
+						const tempDate = e.currentTarget.value.split("-"); 
 						filterCreatedStartDate.setFullYear(
 							parseInt(tempDate[0]),
 						);
-						filterCreatedStartDate.setMonth(
-							parseInt(tempDate[1]) -
-								1,
+						filterCreatedStartDate.setMonth( 
+							parseInt(tempDate[1]) - 1,
 						);
-						filterCreatedStartDate.setDate(
-							parseInt(tempDate[2]),
-						);
+						filterCreatedStartDate.setDate(parseInt(tempDate[2]));
 					}}
-					value={filterCreatedStartDate
-						?.toISOString()
-						.split("T")[0]}
+					value={filterCreatedStartDate?.toISOString().split("T")[0]} 
 					type="date"
 					id="filterCreatedStartDate"
 					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-				/>
+				/> 
 			</div>
 			<div class="mx-1">
-				<label
-					for="filterCreatedEndDate"
-					class="text-left block">To Date:</label
+				<label for="filterCreatedEndDate" class="text-left block"
+					>To Date:</label
 				>
 				<input
 					oninput={(e) => {
-						filterCreatedEndDate =
-							new Date();
-						const tempDate =
-							e.currentTarget.value.split(
-								"-",
-							);
-						filterCreatedEndDate.setFullYear(
-							parseInt(tempDate[0]),
-						);
+						filterCreatedEndDate = new Date();
+						const tempDate = e.currentTarget.value.split("-");
+						filterCreatedEndDate.setFullYear(parseInt(tempDate[0]));
 						filterCreatedEndDate.setMonth(
-							parseInt(tempDate[1]) -
-								1,
+							parseInt(tempDate[1]) - 1,
 						);
-						filterCreatedEndDate.setDate(
-							parseInt(tempDate[2]),
-						);
+						filterCreatedEndDate.setDate(parseInt(tempDate[2]));
 					}}
-					value={filterCreatedEndDate
-						?.toISOString()
-						.split("T")[0]}
+					value={filterCreatedEndDate?.toISOString().split("T")[0]}
 					type="date"
 					id="filterCreatedEndDate"
 					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
-			</div>
+			</div> 
 		</div>
 	</div>
 	<NotecardTable notes={arrangeDisplayedNotes()}></NotecardTable>
-</div>
-
-<HotKeys />
+</div> 
 <AddOrUpdateNote bind:open={openModal}></AddOrUpdateNote>
+
+<HotKeys /> 

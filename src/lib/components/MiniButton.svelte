@@ -4,8 +4,8 @@
         color = "blue",
         classes = "",
         children,
-    } = $props<{
-        onclick?: (e: MouseEvent) => void;
+    } = $props<{ 
+        onclick?: (e: MouseEvent) => void; 
         color?: "blue" | "red" | "white";
         classes?: string;
         children?: any;

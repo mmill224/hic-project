@@ -101,6 +101,6 @@
 
 <AddOrUpdateNote
 	{note}
-	bind:open={editMode}
-	onupdate={(_note) => (note = _note)}
+	bind:open={editMode} 
+	onupdate={(_note) => (note = _note)} 
 ></AddOrUpdateNote>
