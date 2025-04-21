@@ -99,7 +99,5 @@
 <AddOrUpdateNote
 	{note}
 	bind:open={editMode}
-	onupdate={(newNote: Note) => {
-		note = newNote;
-	}}
+	onupdate={(_note) => (note = _note)}
 ></AddOrUpdateNote>

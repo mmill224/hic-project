@@ -4,6 +4,8 @@
 	import type { Note } from "$lib/db";
 	import { addOrUpdateNote } from "$lib/dbDal";
 	import Modal from "./Modal.svelte";
+	import TipTap from "./TipTap.svelte";
+	import { Editor } from "@tiptap/core";
 
 	const DEFAULT_NOTE: Note = {
 		title: "",
@@ -25,39 +27,35 @@
 
 	let success = $state(false);
 	let errorMessage = $state<string>("");
+	let editor = $state<Editor>();
 
-	async function handleSubmit() {
+	async function handleSubmit(e?: MouseEvent) {
+		e?.preventDefault();
 		errorMessage = "";
 		// if the note is already in the db, do not change the created date
-		var createdDate: Date;
-		if (note?.id && note.createdDate) {
-			createdDate = note.createdDate;
-		} else {
-			createdDate = new Date();
-		}
-		note.createdDate = createdDate;
+		note.createdDate =
+			note?.id && note.createdDate ? note.createdDate : new Date();
 		if (!note.title) {
 			errorMessage = "Please add a title to your note";
 			return;
 		}
-		const newNote: Note = {
-			...note,
-		};
-
-		success = await addOrUpdateNote(newNote);
-
+		note.content = editor?.getHTML() ?? note.content;
+		success = await addOrUpdateNote({ ...note });
 		if (success) {
 			open = false;
-			note = { ...DEFAULT_NOTE };
 		}
-		onupdate && onupdate(newNote);
+		onupdate && onupdate({ ...note });
 	}
 </script>
 
 {#if open}
 	<Modal size="sm" title={note.id ? "Edit Note" : "New Note"} bind:open>
 		<TextInput label="Title" bind:value={note.title} />
-		<TextInput type="textarea" label="Content" bind:value={note.content} />
+		<TipTap
+			content={note.content ?? ""}
+			onupdate={() => handleSubmit}
+			bind:editor
+		/>
 
 		{#if errorMessage}
 			<div class="text-red-500 m-2">{errorMessage}</div>

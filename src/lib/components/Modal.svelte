@@ -77,10 +77,13 @@
 
 {#if open}
 	<div
-		class="fixed inset-0 flex items-center justify-center z-100"
+		class="max-h-screen fixed inset-0 flex items-center justify-center z-100"
 		style="background-color: rgba(0,0,0,.5)"
 	>
-		<div class="{sizeClass} bg-gray-700 p-6 shadow-lg" id="modalContainer">
+		<div
+			class="{sizeClass} max-h-full overflow-hidden flex flex-col bg-gray-700 p-6 shadow-lg"
+			id="modalContainer"
+		>
 			<div
 				class="mb-4 items-center flex justify-between text-xl font-semibold"
 			>
@@ -88,7 +91,10 @@
 				<MiniButton
 					classes="hover:bg-gray-600"
 					color="white"
-					onclick={() => (open = !open)}><X /></MiniButton
+					onclick={(e) => {
+						e.preventDefault();
+						open = !open;
+					}}><X /></MiniButton
 				>
 			</div>
 			{@render children()}
