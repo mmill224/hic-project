@@ -4,14 +4,21 @@
 	import Button from "$lib/components/Button.svelte";
 	import AddOrUpdateNote from "$lib/components/AddOrUpdateNote.svelte";
 	import { liveQuery, type Observable } from "dexie";
-	import type { Note } from "$lib/db";
-	import { FunnelX } from "lucide-svelte";
+	import type { Note , Tag} from "$lib/db";
+	import { FunnelX, NotebookTabs} from "lucide-svelte";
 	import MiniButton from "$lib/components/MiniButton.svelte";
 	import HotKeys from "$lib/utils/HotKeys.svelte";
-    import { addOrUpdateNote } from "$lib/dbDal";
+    import { getTagsForNote, getTag } from "$lib/dbDal";
+	import { onMount } from "svelte";
+    import { get } from "svelte/store";
+    import { parse } from "svelte/compiler";
+
+	let _notes: Note[] = $state([]);
 
 	let openModal: boolean = $state(false);
 	let searchTerm = $state("");
+	let searchTagIds: number[] = $state([]);
+	let TitleSearchTerm = $state("");
 
 	let filterCreatedStartDate: Date | undefined = $state(undefined);
 	let filterCreatedEndDate: Date | undefined = $state(undefined);
@@ -30,60 +37,80 @@
 		filterDueEndDate = undefined;
 		searchTerm = "";
 	};
-
-	let arrangeDisplayedNotes = $derived(() => {
-		var result = $dbNotes
-			?.filter((note) => {
-				if (!note.title) {
-					return false;
-				}
-
-				// default date selection is not good, so we need to convert the output to real date objects
-				const createdDate = note.createdDate
-					? new Date(note.createdDate)
-					: null;
-				const createdStartDate = filterCreatedStartDate
-					? new Date(filterCreatedStartDate)
-					: null;
-				const createdEndDate = filterCreatedEndDate
-					? new Date(filterCreatedEndDate)
-					: null;
-
-				const dueDate = note.dueDate ? new Date(note.dueDate) : null;
-				const dueStartDate = filterDueStartDate
-					? new Date(filterDueStartDate)
-					: null;
-				const dueEndDate = filterDueEndDate
-					? new Date(filterDueEndDate)
-					: null;
-
-				// if there's an end date, we want the entire day to be inclusive
-				if (createdEndDate) {
-					createdEndDate.setHours(23, 59, 59, 999); // Set to 11:59:59 PM
-				}
-				if (dueEndDate) {
-					dueEndDate.setHours(23, 59, 59, 999); // Set to 11:59:59 PM
-				}
-
-				return (
-					note.title
-						.toLowerCase()
-						.includes(searchTerm.toLowerCase()) &&
-					(!createdStartDate ||
-						(createdDate && createdDate >= createdStartDate)) &&
-					(!createdEndDate ||
-						(createdDate && createdDate <= createdEndDate)) &&
-					(!dueStartDate || (dueDate && dueDate >= dueStartDate)) &&
-					(!dueEndDate || (dueDate && dueDate <= dueEndDate))
-				);
-			})
-			.sort((a, b) => {
-				const aDate = a.createdDate ? new Date(a.createdDate) : null;
-				const bDate = b.createdDate ? new Date(b.createdDate) : null;
-				return bDate && aDate && bDate > aDate ? 1 : -1;
-			});
-		return result;
+	let parseTagsfromSearchTerm = () => {
+  if (searchTerm) {
+	  const tokens = searchTerm.split(" ");
+	  const nonTagTokens = tokens.filter((token) => !token.startsWith("#"));
+	  TitleSearchTerm = nonTagTokens.join(" ");
+	  let tagnames = tokens.filter((tag) => tag.startsWith("#")).map((tag) => tag.slice(1));
+	  (async () => {
+		  const tags = await Promise.all(tagnames.map((tag) => getTag(tag)));
+		  // Extract `id` and filter out `undefined`
+		  searchTagIds = tags
+		  .map((tag) => tag?.id) // Extract `id`
+		  .filter((id): id is number => id !== undefined); // Remove `undefined`
+		})();
+  }
+};
+let updateNotes = async () => {
+		_notes = await arrangeDisplayedNotes();
+	};
+	$effect(() => {
+		parseTagsfromSearchTerm();
+		updateNotes();
 	});
+	onMount(() => {
+		updateNotes();
+	});
+	let arrangeDisplayedNotes = $derived(async () => {
+    const notes = await Promise.all(
+        $dbNotes.map(async (note) => {
+            if (!note.title) return null;
+
+            // Convert dates
+            const createdDate = note.createdDate ? new Date(note.createdDate) : null;
+            const createdStartDate = filterCreatedStartDate ? new Date(filterCreatedStartDate) : null;
+            const createdEndDate = filterCreatedEndDate ? new Date(filterCreatedEndDate) : null;
+
+            const dueDate = note.dueDate ? new Date(note.dueDate) : null;
+            const dueStartDate = filterDueStartDate ? new Date(filterDueStartDate) : null;
+            const dueEndDate = filterDueEndDate ? new Date(filterDueEndDate) : null;
+
+            // Ensure end dates are inclusive
+            if (createdEndDate) createdEndDate.setHours(23, 59, 59, 999);
+            if (dueEndDate) dueEndDate.setHours(23, 59, 59, 999);
+
+            // Fetch tags for the note
+            const tags = await getTagsForNote(note.id as number);
+            const noteTagIds = tags.map((tag) => tag.id as number);
+
+            // Check if tags match
+            const matchesTag =
+                searchTagIds.length === 0 || searchTagIds.every((tagId) => noteTagIds.includes(tagId));
+
+            // Return the note if it matches all conditions
+            if (
+                note.title.toLowerCase().includes(TitleSearchTerm.toLowerCase()) &&
+                (!createdStartDate || (createdDate && createdDate >= createdStartDate)) &&
+                (!createdEndDate || (createdDate && createdDate <= createdEndDate)) &&
+                (!dueStartDate || (dueDate && dueDate >= dueStartDate)) &&
+                (!dueEndDate || (dueDate && dueDate <= dueEndDate)) &&
+                matchesTag
+            ) {
+                return note;
+            }
+
+            return null;
+        })
+    );
+
+    // Filter out null values and sort the notes
+    return notes.filter((note) => note !== null).sort((a, b) => {
+        const aDate = a.createdDate ? new Date(a.createdDate) : null;
+        const bDate = b.createdDate ? new Date(b.createdDate) : null;
+        return bDate && aDate && bDate > aDate ? 1 : -1;
+    });
+});
 </script>
 
 <div class="mx-auto text-center w-300 m-5">
@@ -95,8 +122,9 @@
 			placeholder="Search"
 			class="w-full rounded-lg bg-gray-800 border border-gray-300 bg-text-gray-100 focus:border-transparent focus:ring-2 focus:ring-white focus:outline-none"
 		/>
-		<Button classes="w-50 ml-2 New-Note-Button" onclick={() => (openModal = true)}
-			>Add Note</Button
+		<Button
+			classes="w-50 ml-2 New-Note-Button"
+			onclick={() => (openModal = true)}>Add Note</Button
 		>
 	</div>
 	<div class="hidden sm:flex justify-between">
@@ -185,7 +213,7 @@
 			</div>
 		</div>
 	</div>
-	<NotecardTable notes={arrangeDisplayedNotes()}></NotecardTable>
+	<NotecardTable bind:notes={_notes}></NotecardTable>
 </div>
 
 <AddOrUpdateNote bind:open={openModal}></AddOrUpdateNote>

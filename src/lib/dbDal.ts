@@ -59,6 +59,16 @@ export async function getTagsForNote(noteId: number): Promise<Tag[]> {
     }
 }
 
+export async function getTag(tagName: string): Promise<Tag> {
+    try {
+        const tag = await db.tags.where("name").equals(tagName).first() as Tag;
+        return tag;
+    } catch (error) {
+        console.log(error);
+        return { id: -1, name: "", color: "" };
+    }
+}
+
 export async function getNotes(): Promise<Note[]> {
     try {
         return await db.notes.toArray();

@@ -6,7 +6,7 @@ export interface Tag {
     id?: number;
     name: string;
     color: string;
-}
+}   
 
 export interface Note {
     id?: number;
