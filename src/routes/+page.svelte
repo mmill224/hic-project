@@ -4,14 +4,14 @@
 	import Button from "$lib/components/Button.svelte";
 	import AddOrUpdateNote from "$lib/components/AddOrUpdateNote.svelte";
 	import { liveQuery, type Observable } from "dexie";
-	import type { Note , Tag} from "$lib/db";
-	import { FunnelX, NotebookTabs} from "lucide-svelte";
+	import type { Note, Tag } from "$lib/db";
+	import { FunnelX, NotebookTabs } from "lucide-svelte";
 	import MiniButton from "$lib/components/MiniButton.svelte";
 	import HotKeys from "$lib/utils/HotKeys.svelte";
-    import { getTagsForNote, getTag } from "$lib/dbDal";
+	import { getTagsForNote, getTag } from "$lib/dbDal";
 	import { onMount } from "svelte";
-    import { get } from "svelte/store";
-    import { parse } from "svelte/compiler";
+	import { get } from "svelte/store";
+	import { parse } from "svelte/compiler";
 
 	let _notes: Note[] = $state([]);
 
@@ -38,21 +38,32 @@
 		searchTerm = "";
 	};
 	let parseTagsfromSearchTerm = () => {
-  if (searchTerm) {
-	  const tokens = searchTerm.split(" ");
-	  const nonTagTokens = tokens.filter((token) => !token.startsWith("#"));
-	  TitleSearchTerm = nonTagTokens.join(" ");
-	  let tagnames = tokens.filter((tag) => tag.startsWith("#")).map((tag) => tag.slice(1));
-	  (async () => {
-		  const tags = await Promise.all(tagnames.map((tag) => getTag(tag)));
-		  // Extract `id` and filter out `undefined`
-		  searchTagIds = tags
-		  .map((tag) => tag?.id) // Extract `id`
-		  .filter((id): id is number => id !== undefined); // Remove `undefined`
-		})();
-  }
-};
-let updateNotes = async () => {
+		if (searchTerm) {
+			const tokens = searchTerm.split(" ");
+			const nonTagTokens = tokens.filter(
+				(token) => !token.startsWith("#"),
+			);
+			TitleSearchTerm = nonTagTokens.join(" ");
+			let tagnames = tokens
+				.filter((tag) => tag.startsWith("#"))
+				.map((tag) => tag.slice(1));
+			(async () => {
+				const tags = await Promise.all(
+					tagnames.map((tag) => getTag(tag)),
+				);
+				// Extract `id` and filter out `undefined`
+				searchTagIds = tags
+					.map((tag) => tag?.id) // Extract `id`
+					.filter((id): id is number => id !== undefined); // Remove `undefined`
+			})();
+		}
+		else {
+			searchTerm = "";
+			TitleSearchTerm = "";
+			searchTagIds = [];
+		}
+	};
+	let updateNotes = async () => {
 		_notes = await arrangeDisplayedNotes();
 	};
 	$effect(() => {
@@ -60,57 +71,85 @@ let updateNotes = async () => {
 		updateNotes();
 	});
 	onMount(() => {
-		updateNotes();
+		const params = new URLSearchParams(window.location.search);
+		const urlSearchTerm = params.get("search");
+		if (urlSearchTerm) {
+			searchTerm += " " + urlSearchTerm;
+		}
 	});
 	let arrangeDisplayedNotes = $derived(async () => {
-    const notes = await Promise.all(
-        $dbNotes.map(async (note) => {
-            if (!note.title) return null;
+		const notes = await Promise.all(
+			$dbNotes.map(async (note) => {
+				if (!note.title) return null;
 
-            // Convert dates
-            const createdDate = note.createdDate ? new Date(note.createdDate) : null;
-            const createdStartDate = filterCreatedStartDate ? new Date(filterCreatedStartDate) : null;
-            const createdEndDate = filterCreatedEndDate ? new Date(filterCreatedEndDate) : null;
+				// Convert dates
+				const createdDate = note.createdDate
+					? new Date(note.createdDate)
+					: null;
+				const createdStartDate = filterCreatedStartDate
+					? new Date(filterCreatedStartDate)
+					: null;
+				const createdEndDate = filterCreatedEndDate
+					? new Date(filterCreatedEndDate)
+					: null;
 
-            const dueDate = note.dueDate ? new Date(note.dueDate) : null;
-            const dueStartDate = filterDueStartDate ? new Date(filterDueStartDate) : null;
-            const dueEndDate = filterDueEndDate ? new Date(filterDueEndDate) : null;
+				const dueDate = note.dueDate ? new Date(note.dueDate) : null;
+				const dueStartDate = filterDueStartDate
+					? new Date(filterDueStartDate)
+					: null;
+				const dueEndDate = filterDueEndDate
+					? new Date(filterDueEndDate)
+					: null;
 
-            // Ensure end dates are inclusive
-            if (createdEndDate) createdEndDate.setHours(23, 59, 59, 999);
-            if (dueEndDate) dueEndDate.setHours(23, 59, 59, 999);
+				// Ensure end dates are inclusive
+				if (createdEndDate) createdEndDate.setHours(23, 59, 59, 999);
+				if (dueEndDate) dueEndDate.setHours(23, 59, 59, 999);
 
-            // Fetch tags for the note
-            const tags = await getTagsForNote(note.id as number);
-            const noteTagIds = tags.map((tag) => tag.id as number);
+				// Fetch tags for the note
+				console.log("Note ID:", note.id);
+				const tags = await getTagsForNote(note.id as number);
+				console.log("Tags fetched for note:", note.id, tags);
 
-            // Check if tags match
-            const matchesTag =
-                searchTagIds.length === 0 || searchTagIds.every((tagId) => noteTagIds.includes(tagId));
+				// Ensure tags is an array before mapping
+				const noteTagIds = (tags || []).map((tag) => tag.id as number);
+				console.log("Note Tag IDs:", noteTagIds);
 
-            // Return the note if it matches all conditions
-            if (
-                note.title.toLowerCase().includes(TitleSearchTerm.toLowerCase()) &&
-                (!createdStartDate || (createdDate && createdDate >= createdStartDate)) &&
-                (!createdEndDate || (createdDate && createdDate <= createdEndDate)) &&
-                (!dueStartDate || (dueDate && dueDate >= dueStartDate)) &&
-                (!dueEndDate || (dueDate && dueDate <= dueEndDate)) &&
-                matchesTag
-            ) {
-                return note;
-            }
+				// Access the value of searchTagIds if it's a store
+				// idk why this makes the errors go away but it does :D
+				const resolvedSearchTagIds = Array.isArray(searchTagIds) ? searchTagIds : searchTagIds as number[];
+				console.log("Search Tag IDs:", resolvedSearchTagIds);
 
-            return null;
-        })
-    );
+				// Check if tags match
+				const matchesTag =
+				  resolvedSearchTagIds.length === 0 ||
+				  resolvedSearchTagIds.every((tagId) => noteTagIds.includes(tagId));
+				console.log("Matches Tag:", matchesTag);
 
-    // Filter out null values and sort the notes
-    return notes.filter((note) => note !== null).sort((a, b) => {
-        const aDate = a.createdDate ? new Date(a.createdDate) : null;
-        const bDate = b.createdDate ? new Date(b.createdDate) : null;
-        return bDate && aDate && bDate > aDate ? 1 : -1;
-    });
-});
+				// Return the note if it matches all conditions
+				if (
+					note.title.toLowerCase().includes(TitleSearchTerm.toLowerCase()) &&
+					(!createdStartDate || (createdDate && createdDate >= createdStartDate)) &&
+					(!createdEndDate || (createdDate && createdDate <= createdEndDate)) &&
+					(!dueStartDate || (dueDate && dueDate >= dueStartDate)) &&
+					(!dueEndDate || (dueDate && dueDate <= dueEndDate)) &&
+					matchesTag
+				) {
+					return note;
+				}
+
+				return null;
+			}),
+		);
+
+		// Filter out null values and sort the notes
+		return notes
+			.filter((note) => note !== null)
+			.sort((a, b) => {
+				const aDate = a.createdDate ? new Date(a.createdDate) : null;
+				const bDate = b.createdDate ? new Date(b.createdDate) : null;
+				return bDate && aDate && bDate > aDate ? 1 : -1;
+			});
+	});
 </script>
 
 <div class="mx-auto text-center w-300 m-5">

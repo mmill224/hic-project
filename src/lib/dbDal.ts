@@ -54,7 +54,7 @@ export async function getTagsForNote(noteId: number): Promise<Tag[]> {
         const tagIds = noteTags.map((rel) => rel.tagId).filter((id): id is number => id !== undefined);
         return await db.tags.where("id").anyOf(tagIds).toArray();
     } catch (error) {
-        console.log(error);
+        console.log("error from getTagsforNote: ", error);
         return [];
     }
 }
