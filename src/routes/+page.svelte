@@ -86,7 +86,7 @@
 	});
 </script>
 
-<div class="mx-auto text-center w-300 m-5">
+<div class="flex flex-col mx-auto text-center w-full m-5">
 	<div class="flex justify-between py-4">
 		<input
 			id="search-bar"
@@ -107,7 +107,7 @@
 		<MiniButton classes="flex" color="blue" onclick={clearFilters}
 			><FunnelX />Clear Filters</MiniButton
 		>
-		<div class="flex justify-between">
+		<div class="flex justify-between flex-wrap">
 			<div class="mx-1">
 				<label for="filterDueStartDate" class="text-left block"
 					>Due From Date:</label

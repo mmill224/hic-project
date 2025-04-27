@@ -52,7 +52,7 @@
 
 <div
 	id="container{id}"
-	class="rounded bg-gray-600 shadow-md h-full flex flex-col"
+	class="rounded bg-gray-600 shadow-md h-full flex flex-col w-full"
 >
 	<div id="header" class="p-4">
 		<div class="flex justify-between">
@@ -82,7 +82,7 @@
 		editable={false}
 		class="
 			note-content
-			bg-gray-500 p-4 text-left w-full grow h-full overflow-hidden
+			bg-gray-500 text-left w-full shrink h-full overflow-hidden
 			{expandContent ? 'break-all' : 'overflow-hidden line-clamp-5'}
 		"
 	/>
@@ -101,6 +101,6 @@
 
 <AddOrUpdateNote
 	{note}
-	bind:open={editMode} 
-	onupdate={(_note) => (note = _note)} 
+	bind:open={editMode}
+	onupdate={(_note) => (note = _note)}
 ></AddOrUpdateNote>

@@ -48,7 +48,7 @@
 	}
 </script>
 
-<Modal size="sm" title={note.id ? "Edit Note" : "New Note"} bind:open>
+<Modal size="md" title={note.id ? "Edit Note" : "New Note"} bind:open>
 	<TextInput label="Title" bind:value={note.title} />
 	<TipTap
 		content={note.content ?? ""}
@@ -60,7 +60,7 @@
 		<div class="text-red-500 m-2">{errorMessage}</div>
 	{/if}
 
-	<div class="flex justify-between">
+	<div class="flex justify-between pt-4">
 		<div class="flex">
 			<input
 				oninput={(e) => {

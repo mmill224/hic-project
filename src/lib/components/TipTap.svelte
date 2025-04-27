@@ -65,7 +65,7 @@
 	class={`
 		${editable && `peer editable`}
 
-		note-content overflow-y-scroll h-full
+		note-content overflow-y-auto h-200
 		${
 			editable &&
 			` 
@@ -131,6 +131,7 @@
 
 <style>
 	.note-content {
+		width: 100%;
 		position: relative;
 		display: flex;
 		flex-direction: column;
