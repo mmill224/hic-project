@@ -122,9 +122,9 @@
 	function handleTagInput(index: number, value: string) {
 		tags[index] = value;
 
-		// Add a new input field if the last one is being edited
-		if (index === tags.length - 1 && value.trim() !== "") {
-			tags = [...tags, ""];
+		// Add a new input field only if the last one is being edited and not empty
+		if (index === tags.length - 1 && value.trim() !== "" && !tags.includes("")) {
+			tags = [...tags, ""]; // Add a new empty tag input
 		}
 	}
 </script>
@@ -144,13 +144,12 @@
 	<div class="mt-4">
 		<h3 class="text-lg font-bold mb-2">Tags</h3>
 		<div class="flex flex-wrap gap-2">
-			{#each tags as tag, index (tag)}
+			{#each tags as tag, index (index)} <!-- Use `index` as the key -->
 				<div class="mb-2">
 					<input
 						type="text"
 						bind:value={tags[index]}
-						oninput={(e) =>
-							handleTagInput(index, e.currentTarget.value)}
+						oninput={(e) => handleTagInput(index, e.currentTarget.value)}
 						placeholder="Enter a tag"
 						class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
 						style="width: auto; min-width: 50px; padding: 4px;"
