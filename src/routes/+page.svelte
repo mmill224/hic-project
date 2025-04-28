@@ -255,6 +255,14 @@
 	<NotecardTable bind:notes={_notes}></NotecardTable>
 </div>
 
-<AddOrUpdateNote bind:open={openModal}></AddOrUpdateNote>
+<AddOrUpdateNote
+    bind:open={openModal}
+    onupdate={(updatedNote: Note) => {
+        // Refresh the tags for the updated note
+        _notes = _notes.map((note) =>
+            note.id === updatedNote.id ? updatedNote : note
+        );
+    }}
+></AddOrUpdateNote>
 
 <HotKeys />
