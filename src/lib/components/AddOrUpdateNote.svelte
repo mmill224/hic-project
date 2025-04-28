@@ -34,6 +34,7 @@
 		if (open && note?.id) {
 			loadTagsForNote();
 		}
+		// Focus the title input when the modal is opened
 	});
 
 	async function loadTagsForNote() {
@@ -124,11 +125,13 @@
 			tags = [...tags, ""];
 		}
 	}
+
+
 </script>
 
 {#if open}
 	<Modal size="sm" title={note.id ? "Edit Note" : "New Note"} bind:open>
-		<TextInput label="Title" bind:value={note.title} />
+		<TextInput label="Title" bind:value={note.title} autofocus />
 		<TextInput type="textarea" label="Content" bind:value={note.content} />
 
 		{#if errorMessage}
