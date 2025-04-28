@@ -86,7 +86,7 @@
 	});
 </script>
 
-<div class="flex flex-col mx-auto text-center w-full m-5">
+<div class="flex flex-col mx-auto text-center w-full max-w-300 m-5">
 	<div class="flex justify-between py-4">
 		<input
 			id="search-bar"
