@@ -37,6 +37,7 @@
 		if (open && note?.id) {
 			loadTagsForNote();
 		}
+		// Focus the title input when the modal is opened
 	});
 
 	async function loadTagsForNote() {
@@ -127,10 +128,12 @@
 			tags = [...tags, ""]; // Add a new empty tag input
 		}
 	}
+
+
 </script>
 
 <Modal size="md" title={note.id ? "Edit Note" : "New Note"} bind:open>
-	<TextInput label="Title" bind:value={note.title} />
+	<TextInput label="Title" bind:value={note.title} autofocus />
 	<TipTap
 		content={note.content ?? ""}
 		onupdate={() => handleSubmit}
