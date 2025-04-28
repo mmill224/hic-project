@@ -17,7 +17,11 @@
     class="{classes} cursor-pointer rounded items-center
     text-center font-bold hover:text-white focus:border-transparent focus:ring-2 focus:ring-white focus:outline-none
     transition duration-100 bg-transparent
-    text-{color}-500
+    {color == 'red'
+        ? 'text-red-500'
+        : color == 'blue'
+          ? 'text-blue-500'
+          : 'text-white'}
     p-2
     "
     >{@render children()}

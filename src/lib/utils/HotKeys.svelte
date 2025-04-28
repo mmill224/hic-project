@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { db, getTags} from "$lib/db"; // Import the database instance
+  import type { Tag } from "$lib/db";
   import { onMount } from "svelte";
 
   // Example: Hotkey for "Ctrl + S"
@@ -14,6 +16,14 @@
       el?.click();
     }
     //other hotkeys here
+    if (event.altKey && event.key === "r") {
+      getTags().then((tags: Tag[]) => {
+        console.log("Tags: ", tags);
+      });
+      db.noteTagRelation.toArray().then((relations) => {
+        console.log("Relations: ", relations);
+      });
+    }
   }
 
   // Add event listener on mount
