@@ -3,10 +3,10 @@
 	import Button from "./Button.svelte";
 	import type { Note, Tag, noteTagRelation } from "$lib/db";
 	import { addOrUpdateNote } from "$lib/dbDal";
-	import Modal from "./Modal.svelte"; 
+	import Modal from "./Modal.svelte";
 	import TipTap from "./TipTap.svelte";
-	import { Editor } from "@tiptap/core"; 
-	import { db } from "$lib/db"; // Import the database instance 
+	import { Editor } from "@tiptap/core";
+	import { db } from "$lib/db"; // Import the database instance
 
 	const DEFAULT_NOTE: Note = {
 		title: "",
@@ -28,8 +28,8 @@
 	let note = $state(_note);
 
 	let success = $state(false);
-	let errorMessage = $state<string>(""); 
-	let editor = $state<Editor>(); 
+	let errorMessage = $state<string>("");
+	let editor = $state<Editor>();
 	let tags = $state<string[]>([""]); // Initialize with one empty input
 
 	// Fetch tags when the modal is opened
@@ -41,27 +41,36 @@
 
 	async function loadTagsForNote() {
 		if (note?.id) {
-			const relations = await db.noteTagRelation.where("noteId").equals(note.id).toArray();
-			const tagIds = relations.map((relation) => relation.tagId).filter((id): id is number => id !== undefined);
-			const existingTags = await db.tags.where("id").anyOf(tagIds).toArray();
+			const relations = await db.noteTagRelation
+				.where("noteId")
+				.equals(note.id)
+				.toArray();
+			const tagIds = relations
+				.map((relation) => relation.tagId)
+				.filter((id): id is number => id !== undefined);
+			const existingTags = await db.tags
+				.where("id")
+				.anyOf(tagIds)
+				.toArray();
 			tags = existingTags.map((tag) => tag.name); // Populate tags with tag names
 			tags = [...tags, ""]; // Add an empty input for new tags
 		}
-	} 
+	}
 
 	async function handleSubmit(e?: MouseEvent) {
 		e?.preventDefault();
-		errorMessage = ""; 
+		errorMessage = "";
 		// if the note is already in the db, do not change the created date
 		note.createdDate =
-			note?.id && note.createdDate ? note.createdDate : new Date(); 
+			note?.id && note.createdDate ? note.createdDate : new Date();
 		if (!note.title) {
 			errorMessage = "Please add a title to your note";
 			return;
-		} 
+		}
 		note.content = editor?.getHTML() ?? note.content;
-		success = await addOrUpdateNote({ ...note }); 
- 
+		const newNote = { ...note };
+		success = await addOrUpdateNote(newNote);
+
 		if (success) {
 			// Get the note ID (if it's a new note, the ID will be generated)
 			const noteId = newNote.id;
@@ -79,7 +88,10 @@
 
 				if (!tag) {
 					// If the tag doesn't exist, add it to the tags table
-					const tagId = await db.tags.add({ name: tagName, color: "#000000" });
+					const tagId = await db.tags.add({
+						name: tagName,
+						color: "#000000",
+					});
 					tag = { id: tagId, name: tagName, color: "#000000" };
 				}
 
@@ -100,12 +112,11 @@
 			}
 
 			// Reset the form
-			open = false;  
+			open = false;
 			note = { ...DEFAULT_NOTE };
 			tags = [""];
 		}
 		onupdate && onupdate({ ...note });
-  
 	}
 
 	function handleTagInput(index: number, value: string) {
@@ -129,27 +140,28 @@
 	{#if errorMessage}
 		<div class="text-red-500 m-2">{errorMessage}</div>
 	{/if}
- 
-		<div class="mt-4">
-			<h3 class="text-lg font-bold mb-2">Tags</h3>
-			<div class="flex flex-wrap gap-2">
-				{#each tags as tag, index}
-					<div class="mb-2">
-						<input
-							type="text"
-							bind:value={tags[index]}
-							oninput={(e) => handleTagInput(index, e.currentTarget.value)}
-							placeholder="Enter a tag"
-							class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-							style="width: auto; min-width: 50px; padding: 4px;"
-							size={tags[index]?.length || 1}
-						/>
-					</div>
-				{/each}
-			</div>
-		</div>
 
-		<div class="flex justify-between mt-4">
-			<Button onclick={handleSubmit}>Submit</Button> 
-		</div>  
+	<div class="mt-4">
+		<h3 class="text-lg font-bold mb-2">Tags</h3>
+		<div class="flex flex-wrap gap-2">
+			{#each tags as tag, index (tag)}
+				<div class="mb-2">
+					<input
+						type="text"
+						bind:value={tags[index]}
+						oninput={(e) =>
+							handleTagInput(index, e.currentTarget.value)}
+						placeholder="Enter a tag"
+						class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+						style="width: auto; min-width: 50px; padding: 4px;"
+						size={tags[index]?.length || 1}
+					/>
+				</div>
+			{/each}
+		</div>
+	</div>
+
+	<div class="flex justify-between mt-4">
+		<Button onclick={handleSubmit}>Submit</Button>
+	</div>
 </Modal>
