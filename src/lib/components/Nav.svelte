@@ -4,7 +4,7 @@
 	export let logoutOnClick = () => {};
 </script>
 
-<nav class="bg-gray-800 p-4">
+<nav class="sticky top-0 z-50 bg-gray-800 p-4">
 	<div class="container mx-auto flex items-center justify-between">
 		<div class="flex space-x-4 text-xl" style="max-width: 300px;">
 			<!-- Navbar Items -->

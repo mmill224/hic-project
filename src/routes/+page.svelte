@@ -14,6 +14,7 @@
 	import { parse } from "svelte/compiler";
 
 	let _notes: Note[] = $state([]);
+	import { addOrUpdateNote } from "$lib/dbDal";
 
 	let openModal: boolean = $state(false);
 	let searchTerm = $state("");
@@ -152,7 +153,7 @@
 	});
 </script>
 
-<div class="mx-auto text-center w-300 m-5">
+<div class="flex flex-col mx-auto text-center w-full max-w-300 m-5">
 	<div class="flex justify-between py-4">
 		<input
 			id="search-bar"
@@ -163,14 +164,17 @@
 		/>
 		<Button
 			classes="w-50 ml-2 New-Note-Button"
-			onclick={() => (openModal = true)}>Add Note</Button
+			onclick={(e: MouseEvent) => {
+				e.stopPropagation();
+				openModal = true;
+			}}>Add Note</Button
 		>
 	</div>
 	<div class="hidden sm:flex justify-between">
 		<MiniButton classes="flex" color="blue" onclick={clearFilters}
 			><FunnelX />Clear Filters</MiniButton
 		>
-		<div class="flex justify-between">
+		<div class="flex justify-between flex-wrap">
 			<div class="mx-1">
 				<label for="filterDueStartDate" class="text-left block"
 					>Due From Date:</label
