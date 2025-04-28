@@ -61,13 +61,16 @@
 	async function handleSubmit(e?: MouseEvent) {
 		e?.preventDefault();
 		errorMessage = "";
-		// if the note is already in the db, do not change the created date
+
+		// If the note is already in the database, do not change the created date
 		note.createdDate =
 			note?.id && note.createdDate ? note.createdDate : new Date();
+
 		if (!note.title) {
 			errorMessage = "Please add a title to your note";
 			return;
 		}
+
 		note.content = editor?.getHTML() ?? note.content;
 		const newNote = { ...note };
 		success = await addOrUpdateNote(newNote);
@@ -117,7 +120,6 @@
 			note = { ...DEFAULT_NOTE };
 			tags = [""];
 		}
-		onupdate && onupdate({ ...note });
 	}
 
 	function handleTagInput(index: number, value: string) {
@@ -136,7 +138,6 @@
 	<TextInput label="Title" bind:value={note.title} autofocus />
 	<TipTap
 		content={note.content ?? ""}
-		onupdate={() => handleSubmit}
 		bind:editor
 	/>
 

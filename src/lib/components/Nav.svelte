@@ -14,11 +14,6 @@
 				>Home</a
 			>
 			<a
-				href="/notes"
-				class="focus:border-transparent focus:ring-2 focus:ring-white focus:outline-none rounded-md px-3 py-2 text-xl text-gray-300 hover:bg-gray-700 hover:text-white"
-				>Tasks</a
-			>
-			<a
 				href="/tags"
 				class="focus:border-transparent focus:ring-2 focus:ring-white focus:outline-none rounded-md px-3 py-2 text-xl text-gray-300 hover:bg-gray-700 hover:text-white"
 				>Tags</a

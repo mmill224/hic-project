@@ -15,6 +15,7 @@
 
 	let _notes: Note[] = $state([]);
 	import { addOrUpdateNote } from "$lib/dbDal";
+    import { on } from "svelte/events";
 
 	let openModal: boolean = $state(false);
 	let searchTerm = $state("");
