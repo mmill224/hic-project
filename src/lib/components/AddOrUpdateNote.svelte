@@ -126,45 +126,67 @@
 		tags[index] = value;
 
 		// Add a new input field only if the last one is being edited and not empty
-		if (index === tags.length - 1 && value.trim() !== "" && !tags.includes("")) {
+		if (
+			index === tags.length - 1 &&
+			value.trim() !== "" &&
+			!tags.includes("")
+		) {
 			tags = [...tags, ""]; // Add a new empty tag input
 		}
 	}
-
-
 </script>
 
 <Modal size="md" title={note.id ? "Edit Note" : "New Note"} bind:open>
 	<TextInput label="Title" bind:value={note.title} autofocus />
-	<TipTap
-		content={note.content ?? ""}
-		bind:editor
-	/>
+	<TipTap content={note.content ?? ""} bind:editor />
 
 	{#if errorMessage}
 		<div class="text-red-500 m-2">{errorMessage}</div>
 	{/if}
 
-	<div class="mt-4">
-		<h3 class="text-lg font-bold mb-2">Tags</h3>
-		<div class="flex flex-wrap gap-2">
-			{#each tags as tag, index (index)} <!-- Use `index` as the key -->
-				<div class="mb-2">
-					<input
-						type="text"
-						bind:value={tags[index]}
-						oninput={(e) => handleTagInput(index, e.currentTarget.value)}
-						placeholder="Enter a tag"
-						class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-						style="width: auto; min-width: 50px; padding: 4px;"
-						size={tags[index]?.length || 1}
-					/>
-				</div>
-			{/each}
+	<div class="mt-4 flex justify-between">
+		<div>
+			<h3 class="text-lg font-bold mb-2 text-left">Tags</h3>
+			<div class="flex flex-wrap gap-2">
+				{#each tags as tag, index (index)}
+					<!-- Use `index` as the key -->
+					<div class="mb-2">
+						<input
+							type="text"
+							bind:value={tags[index]}
+							oninput={(e) =>
+								handleTagInput(index, e.currentTarget.value)}
+							placeholder="Enter a tag"
+							class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+							style="width: auto; min-width: 50px; padding: 4px;"
+							size={tags[index]?.length || 1}
+						/>
+					</div>
+				{/each}
+			</div>
+		</div>
+		<div>
+			<div>
+				<h3 class="text-right text-lg font-bold mb-2">Due date</h3>
+				<input
+					oninput={(e) => {
+						note.dueDate = new Date();
+						const tempDate = e.currentTarget.value.split("-");
+						note.dueDate.setFullYear(parseInt(tempDate[0]));
+						note.dueDate.setMonth(parseInt(tempDate[1]) - 1);
+						note.dueDate.setDate(parseInt(tempDate[2]));
+					}}
+					value={note.dueDate?.toISOString().split("T")[0]}
+					type="date"
+					id="filterDueEndDate"
+					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+				/>
+			</div>
 		</div>
 	</div>
 
 	<div class="flex justify-between mt-4">
+		<div></div>
 		<Button onclick={handleSubmit}>Submit</Button>
 	</div>
 </Modal>

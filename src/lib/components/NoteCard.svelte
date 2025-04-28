@@ -6,6 +6,7 @@
 	import { Trash2, Pencil } from "lucide-svelte"; 
 	import TipTap from "./TipTap.svelte"; 
 	import { db } from "$lib/db"; 
+	import type { Tag } from "$lib/db";
 
 	let { note = $bindable(), id = $bindable(0) } = $props<{
 		note: Note;
