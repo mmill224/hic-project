@@ -3,9 +3,9 @@
 	import MiniButton from "./MiniButton.svelte";
 	import AddOrUpdateNote from "./AddOrUpdateNote.svelte";
 	import { deleteNote, getTagsForNote } from "$lib/dbDal";
-	import { Trash2, Pencil } from "lucide-svelte"; 
-	import TipTap from "./TipTap.svelte"; 
-	import { db } from "$lib/db"; 
+	import { Trash2, Pencil } from "lucide-svelte";
+	import TipTap from "./TipTap.svelte";
+	import { db } from "$lib/db";
 	import type { Tag } from "$lib/db";
 
 	let { note = $bindable(), id = $bindable(0) } = $props<{
@@ -30,7 +30,6 @@
 		} else {
 			alert("Failed to delete note");
 		}
-
 	};
 	$effect(() => {
 		if (note?.dueDate) {
@@ -123,8 +122,4 @@
 	</div>
 </div>
 
-<AddOrUpdateNote
-	{note}
-	bind:open={editMode}
-	onupdate={(_note) => (note = _note)}
-></AddOrUpdateNote>
+<AddOrUpdateNote bind:note bind:open={editMode}></AddOrUpdateNote>

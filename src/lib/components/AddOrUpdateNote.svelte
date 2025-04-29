@@ -23,9 +23,8 @@
 	let {
 		onupdate,
 		open = $bindable(false),
-		note: _note = { ...DEFAULT_NOTE },
+		note = $bindable({ ...DEFAULT_NOTE }),
 	}: NoteProps = $props();
-	let note = $state(_note);
 
 	let success = $state(false);
 	let errorMessage = $state<string>("");
@@ -76,6 +75,7 @@
 		success = await addOrUpdateNote(newNote);
 
 		if (success) {
+			onupdate && onupdate(newNote);
 			// Get the note ID (if it's a new note, the ID will be generated)
 			const noteId = newNote.id;
 
@@ -116,9 +116,8 @@
 			}
 
 			// Reset the form
+			note = newNote;
 			open = false;
-			note = { ...DEFAULT_NOTE };
-			tags = [""];
 		}
 	}
 
@@ -148,7 +147,7 @@
 		<div>
 			<h3 class="text-lg font-bold mb-2 text-left">Tags</h3>
 			<div class="flex flex-wrap gap-2">
-				{#each tags as tag, index (index)}
+				{#each tags as _, index (index)}
 					<!-- Use `index` as the key -->
 					<div class="mb-2">
 						<input
