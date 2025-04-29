@@ -3,10 +3,9 @@
 	import MiniButton from "./MiniButton.svelte";
 	import AddOrUpdateNote from "./AddOrUpdateNote.svelte";
 	import { deleteNote, getTagsForNote } from "$lib/dbDal";
-	import { Trash2, Pencil } from "lucide-svelte";
+	import { Trash2, Pencil, Eye } from "lucide-svelte";
 	import TipTap from "./TipTap.svelte";
 	import { db } from "$lib/db";
-	import type { Tag } from "$lib/db";
 	import { onMount } from "svelte";
 	import TagList from "./TagList.svelte";
 
@@ -16,7 +15,6 @@
 	}>();
 
 	let expandTitle = $state(false);
-	let expandContent = $state(false);
 
 	let dueDateString = $state("");
 	let createdDateString = $state("");
@@ -70,7 +68,7 @@
 
 <div
 	id="container{id}"
-	class="rounded bg-gray-600 shadow-md h-full flex flex-col w-full"
+	class="rounded bg-gray-600 shadow-md max-h-full flex flex-col w-full"
 >
 	<div id="header" class="p-4">
 		<div class="flex justify-between">
@@ -98,13 +96,9 @@
 	<TipTap
 		content={note.content}
 		editable={false}
-		class="
-			note-content
-			bg-gray-500 text-left w-full shrink h-full overflow-hidden
-			{expandContent ? 'break-all' : 'overflow-hidden line-clamp-5'}
-		"
+		class="note-content bg-gray-500 text-left w-full overflow-hidden"
 	/>
-	<div id="footer" class="flex justify-between p-4 h-20">
+	<div id="footer" class="flex justify-between p-4">
 		<div id="tags" class="flex">
 			<TagList bind:tags editable={false}></TagList>
 		</div>

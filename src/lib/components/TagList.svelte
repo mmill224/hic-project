@@ -9,7 +9,7 @@
     }>();
 </script>
 
-<div id="tag-container" class="flex flex-wrap gap-2 items-center">
+<div id="tag-container" class="flex flex-wrap items-center">
     {#if editable}
         <MiniButton
             classes={tags.length > 4 ? "hidden" : ""}

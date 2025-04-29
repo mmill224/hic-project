@@ -33,10 +33,8 @@
     </span>
 {:else}
     <span
-        class="rounded bg-gray-700 text-gray-100 flex justify-between items-center pl-1 pr-1 m-1"
+        class="m-1 p-1 max-w-25 rounded bg-gray-700 text-gray-100 flex justify-between items-center overflow-hidden  whitespace-nowrap truncate"
     >
-        <span class="m-1">
-            {tag}
-        </span>
+        {tag}
     </span>
 {/if}

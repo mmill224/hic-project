@@ -263,11 +263,8 @@
 
 <AddOrUpdateNote
 	bind:open={openModal}
-	onupdate={(updatedNote: Note) => {
-		// Refresh the tags for the updated note
-		_notes = _notes.map((note) =>
-			note.id === updatedNote.id ? updatedNote : note,
-		);
+	onupdate={async () => {
+		await updateNotes();
 	}}
 ></AddOrUpdateNote>
 

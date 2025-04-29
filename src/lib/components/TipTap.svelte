@@ -63,9 +63,10 @@
 	role="button"
 	tabindex="0"
 	class={`
-		${editable && `peer editable`}
+		min-h-30
+		${editable && `peer editable h-200`}
 
-		note-content overflow-y-auto h-200
+		note-content overflow-y-auto 
 		${
 			editable &&
 			` 
@@ -139,7 +140,9 @@
 
 	.note-content :global(.tiptap) {
 		cursor: text;
-		height: 100%;
+		height: auto; /* not 100% */
+		max-height: 100%;
+		overflow-y: auto;
 	}
 
 	.note-content :global(.tiptap:focus) {

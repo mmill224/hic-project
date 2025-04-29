@@ -22,7 +22,7 @@
 	};
 
 	let {
-		onupdate,
+		onupdate = () => {},
 		open = $bindable(false),
 		note: _note = { ...DEFAULT_NOTE },
 	}: NoteProps = $props();
@@ -120,6 +120,7 @@
 			note = { ...DEFAULT_NOTE };
 			tags = [];
 		}
+		onupdate(newNote);
 	}
 </script>
 
