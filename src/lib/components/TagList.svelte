@@ -9,14 +9,18 @@
     }>();
 </script>
 
-<div class="flex justify-between">
-    <MiniButton
-        color="blue"
-        onclick={() => {
-            tags = ["", ...tags];
-        }}><Plus /></MiniButton
-    >
+<div id="tag-container" class="flex flex-wrap gap-2 items-center">
+    {#if editable}
+        <MiniButton
+            classes={tags.length > 4 ? "hidden" : ""}
+            disabled={(tags[0]?.length ?? 1) == 0}
+            color="blue"
+            onclick={() => {
+                tags = ["", ...tags];
+            }}><Plus /></MiniButton
+        >
+    {/if}
     {#each tags as element, i}
-        <TagInput bind:tag={tags[i]}></TagInput>
+        <TagInput bind:editable bind:tag={tags[i]}></TagInput>
     {/each}
 </div>

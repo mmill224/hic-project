@@ -3,10 +3,12 @@
 	import MiniButton from "./MiniButton.svelte";
 	import AddOrUpdateNote from "./AddOrUpdateNote.svelte";
 	import { deleteNote, getTagsForNote } from "$lib/dbDal";
-	import { Trash2, Pencil } from "lucide-svelte"; 
-	import TipTap from "./TipTap.svelte"; 
-	import { db } from "$lib/db"; 
+	import { Trash2, Pencil } from "lucide-svelte";
+	import TipTap from "./TipTap.svelte";
+	import { db } from "$lib/db";
 	import type { Tag } from "$lib/db";
+	import { onMount } from "svelte";
+	import TagList from "./TagList.svelte";
 
 	let { note = $bindable(), id = $bindable(0) } = $props<{
 		note: Note;
@@ -30,7 +32,6 @@
 		} else {
 			alert("Failed to delete note");
 		}
-
 	};
 	$effect(() => {
 		if (note?.dueDate) {
@@ -55,18 +56,15 @@
 	});
 
 	let editMode = $state(false);
-	let tags = $state<Tag[]>([]);
+	let tags = $state<string[]>([]);
 
-	async function getTags() {
+	onMount(async () => {
 		if (note?.id) {
-			tags = await getTagsForNote(note.id);
-		} else {
-			tags = [];
+			tags = (await getTagsForNote(note.id)).reduce((acc, tag) => {
+				acc.push(tag.name);
+				return acc;
+			}, [] as string[]);
 		}
-	}
-
-	$effect(() => {
-		getTags();
 	});
 </script>
 
@@ -108,11 +106,7 @@
 	/>
 	<div id="footer" class="flex justify-between p-4 h-20">
 		<div id="tags" class="flex">
-			{#each tags as tag}
-				<p class="mr-2 bg-gray-700 rounded px-2 py-1 text-sm h-[2em]">
-					{tag.name}
-				</p>
-			{/each}
+			<TagList bind:tags editable={false}></TagList>
 		</div>
 		<MiniButton
 			onclick={(e: MouseEvent) => {

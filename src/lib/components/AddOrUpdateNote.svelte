@@ -1,14 +1,12 @@
 <script lang="ts">
 	import TextInput from "./TextInput.svelte";
 	import Button from "./Button.svelte";
-	import { Plus } from "lucide-svelte";
-	import type { Note, Tag, noteTagRelation } from "$lib/db";
+	import type { Note } from "$lib/db";
 	import { addOrUpdateNote } from "$lib/dbDal";
 	import Modal from "./Modal.svelte";
 	import TipTap from "./TipTap.svelte";
 	import { Editor } from "@tiptap/core";
 	import { db } from "$lib/db"; // Import the database instance
-	import MiniButton from "./MiniButton.svelte";
 	import TagList from "./TagList.svelte";
 
 	const DEFAULT_NOTE: Note = {
@@ -57,7 +55,6 @@
 				.anyOf(tagIds)
 				.toArray();
 			tags = existingTags.map((tag) => tag.name); // Populate tags with tag names
-			
 		}
 	}
 
@@ -124,23 +121,10 @@
 			tags = [];
 		}
 	}
-
-	function handleTagInput(index: number, value: string) {
-		tags[index] = value;
-
-		// Add a new input field only if the last one is being edited and not empty
-		if (
-			index === tags.length - 1 &&
-			value.trim() !== "" &&
-			!tags.includes("")
-		) {
-			tags = [...tags]; 
-		}
-	}
 </script>
 
 <Modal size="md" title={note.id ? "Edit Note" : "New Note"} bind:open>
-	<TextInput label="Title" bind:value={note.title} autofocus />
+	<TextInput label="Title" bind:value={note.title} />
 	<TipTap content={note.content ?? ""} bind:editor />
 
 	{#if errorMessage}
@@ -150,10 +134,7 @@
 	<div class="mt-4 flex justify-between">
 		<div>
 			<h3 class="text-lg font-bold mb-2 text-left">Tags</h3>
-			<div class="flex flex-wrap gap-2">
-
-				<TagList bind:tags></TagList>
-			</div>
+			<TagList bind:tags></TagList>
 		</div>
 		<div>
 			<div>
