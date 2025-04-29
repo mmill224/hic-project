@@ -11,7 +11,9 @@
 	import { getTagsForNote, getTag } from "$lib/dbDal";
 	import { onMount } from "svelte";
 
-	let _notes: Note[] = $state([]);
+	let _notes: Note[] = $state([]); 
+	import { addOrUpdateNote } from "$lib/dbDal";
+	import { on } from "svelte/events"; 
 
 	let openModal: boolean = $state(false);
 	let searchTerm = $state("");
@@ -74,10 +76,8 @@
 			searchTerm += " " + urlSearchTerm;
 		}
 	});
-	let arrangeDisplayedNotes = $derived(async () => {
-		if ($dbNotes == undefined) {
-			return [];
-		}
+	let arrangeDisplayedNotes = $derived(async () => { 
+		if (!$dbNotes) return []; 
 		const notes = await Promise.all(
 			$dbNotes?.map(async (note) => {
 				if (!note.title) return null;
@@ -105,47 +105,34 @@
 				if (createdEndDate) createdEndDate.setHours(23, 59, 59, 999);
 				if (dueEndDate) dueEndDate.setHours(23, 59, 59, 999);
 
-				// Fetch tags for the note
-				//console.log("Note ID:", note.id);
+				// Fetch tags for the note 
 				const tags = await getTagsForNote(note.id as number);
-				//console.log(
-				//	"Tags fetched for note:",
-				//	note.id,
-				//	tags,
-				//);
-
 				// Ensure tags is an array before mapping
-				const noteTagIds = (tags || []).map((tag) => tag.id as number);
-				//console.log("Note Tag IDs:", noteTagIds);
-
+				const noteTagIds = (tags || []).map((tag) => tag.id as number); 
 				// Access the value of searchTagIds if it's a store
 				// idk why this makes the errors go away but it does :D
 				const resolvedSearchTagIds = Array.isArray(searchTagIds)
 					? searchTagIds
-					: (searchTagIds as number[]);
-				//console.log(
-				//	"Search Tag IDs:",
-				//	resolvedSearchTagIds,
-				//);
+					: (searchTagIds as number[]); 
 
 				// Check if tags match
 				const matchesTag =
 					resolvedSearchTagIds.length === 0 ||
 					resolvedSearchTagIds.every((tagId) =>
 						noteTagIds.includes(tagId),
-					);
-				//console.log("Matches Tag:", matchesTag);
+					); 
 
 				// Return the note if it matches all conditions
 				if (
 					note.title
-						.toLowerCase()
-						.includes(
-							TitleSearchTerm.toLowerCase()) &&
-							(!createdStartDate || (createdDate && createdDate >= createdStartDate)) &&
-							(!createdEndDate || (createdDate && createdDate <= createdEndDate)) &&
-							(!dueStartDate || (dueDate && dueDate >= dueStartDate)) &&
-							(!dueEndDate || (dueDate && dueDate <= dueEndDate)) &&
+						.toLowerCase() 
+						.includes(TitleSearchTerm.toLowerCase()) &&
+					(!createdStartDate ||
+						(createdDate && createdDate >= createdStartDate)) &&
+					(!createdEndDate ||
+						(createdDate && createdDate <= createdEndDate)) &&
+					(!dueStartDate || (dueDate && dueDate >= dueStartDate)) &&
+					(!dueEndDate || (dueDate && dueDate <= dueEndDate)) && 
 					matchesTag
 				) {
 					return note;
