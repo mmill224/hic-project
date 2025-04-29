@@ -1,12 +1,15 @@
 <script lang="ts">
 	import TextInput from "./TextInput.svelte";
 	import Button from "./Button.svelte";
+	import { Plus } from "lucide-svelte";
 	import type { Note, Tag, noteTagRelation } from "$lib/db";
 	import { addOrUpdateNote } from "$lib/dbDal";
 	import Modal from "./Modal.svelte";
 	import TipTap from "./TipTap.svelte";
 	import { Editor } from "@tiptap/core";
 	import { db } from "$lib/db"; // Import the database instance
+	import MiniButton from "./MiniButton.svelte";
+	import TagList from "./TagList.svelte";
 
 	const DEFAULT_NOTE: Note = {
 		title: "",
@@ -30,7 +33,7 @@
 	let success = $state(false);
 	let errorMessage = $state<string>("");
 	let editor = $state<Editor>();
-	let tags = $state<string[]>([""]); // Initialize with one empty input
+	let tags = $state<string[]>([]); // Initialize with one empty input
 
 	// Fetch tags when the modal is opened
 	$effect(() => {
@@ -54,7 +57,7 @@
 				.anyOf(tagIds)
 				.toArray();
 			tags = existingTags.map((tag) => tag.name); // Populate tags with tag names
-			tags = [...tags, ""]; // Add an empty input for new tags
+			
 		}
 	}
 
@@ -118,7 +121,7 @@
 			// Reset the form
 			open = false;
 			note = { ...DEFAULT_NOTE };
-			tags = [""];
+			tags = [];
 		}
 	}
 
@@ -131,7 +134,7 @@
 			value.trim() !== "" &&
 			!tags.includes("")
 		) {
-			tags = [...tags, ""]; // Add a new empty tag input
+			tags = [...tags]; 
 		}
 	}
 </script>
@@ -148,21 +151,8 @@
 		<div>
 			<h3 class="text-lg font-bold mb-2 text-left">Tags</h3>
 			<div class="flex flex-wrap gap-2">
-				{#each tags as tag, index (index)}
-					<!-- Use `index` as the key -->
-					<div class="mb-2">
-						<input
-							type="text"
-							bind:value={tags[index]}
-							oninput={(e) =>
-								handleTagInput(index, e.currentTarget.value)}
-							placeholder="Enter a tag"
-							class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
-							style="width: auto; min-width: 50px; padding: 4px;"
-							size={tags[index]?.length || 1}
-						/>
-					</div>
-				{/each}
+
+				<TagList bind:tags></TagList>
 			</div>
 		</div>
 		<div>
