@@ -52,10 +52,7 @@
 				// Extract `id` and filter out `undefined`
 				searchTagIds = tags
 					.map((tag) => tag?.id) // Extract `id`
-					.filter(
-						(id): id is number =>
-							id !== undefined,
-					); // Remove `undefined`
+					.filter((id): id is number => id !== undefined); // Remove `undefined`
 			})();
 		} else {
 			searchTerm = "";
@@ -96,9 +93,7 @@
 					? new Date(filterCreatedEndDate)
 					: null;
 
-				const dueDate = note.dueDate
-					? new Date(note.dueDate)
-					: null;
+				const dueDate = note.dueDate ? new Date(note.dueDate) : null;
 				const dueStartDate = filterDueStartDate
 					? new Date(filterDueStartDate)
 					: null;
@@ -107,21 +102,12 @@
 					: null;
 
 				// Ensure end dates are inclusive
-				if (createdEndDate)
-					createdEndDate.setHours(
-						23,
-						59,
-						59,
-						999,
-					);
-				if (dueEndDate)
-					dueEndDate.setHours(23, 59, 59, 999);
+				if (createdEndDate) createdEndDate.setHours(23, 59, 59, 999);
+				if (dueEndDate) dueEndDate.setHours(23, 59, 59, 999);
 
 				// Fetch tags for the note
 				//console.log("Note ID:", note.id);
-				const tags = await getTagsForNote(
-					note.id as number,
-				);
+				const tags = await getTagsForNote(note.id as number);
 				//console.log(
 				//	"Tags fetched for note:",
 				//	note.id,
@@ -129,16 +115,12 @@
 				//);
 
 				// Ensure tags is an array before mapping
-				const noteTagIds = (tags || []).map(
-					(tag) => tag.id as number,
-				);
+				const noteTagIds = (tags || []).map((tag) => tag.id as number);
 				//console.log("Note Tag IDs:", noteTagIds);
 
 				// Access the value of searchTagIds if it's a store
 				// idk why this makes the errors go away but it does :D
-				const resolvedSearchTagIds = Array.isArray(
-					searchTagIds,
-				)
+				const resolvedSearchTagIds = Array.isArray(searchTagIds)
 					? searchTagIds
 					: (searchTagIds as number[]);
 				//console.log(
@@ -159,24 +141,11 @@
 					note.title
 						.toLowerCase()
 						.includes(
-							TitleSearchTerm.toLowerCase(),
-						) &&
-					(!createdStartDate ||
-						(createdDate &&
-							createdDate >=
-								createdStartDate)) &&
-					(!createdEndDate ||
-						(createdDate &&
-							createdDate <=
-								createdEndDate)) &&
-					(!dueStartDate ||
-						(dueDate &&
-							dueDate >=
-								dueStartDate)) &&
-					(!dueEndDate ||
-						(dueDate &&
-							dueDate <=
-								dueEndDate)) &&
+							TitleSearchTerm.toLowerCase()) &&
+							(!createdStartDate || (createdDate && createdDate >= createdStartDate)) &&
+							(!createdEndDate || (createdDate && createdDate <= createdEndDate)) &&
+							(!dueStartDate || (dueDate && dueDate >= dueStartDate)) &&
+							(!dueEndDate || (dueDate && dueDate <= dueEndDate)) &&
 					matchesTag
 				) {
 					return note;
@@ -190,12 +159,8 @@
 		return notes
 			.filter((note) => note !== null)
 			.sort((a, b) => {
-				const aDate = a.createdDate
-					? new Date(a.createdDate)
-					: null;
-				const bDate = b.createdDate
-					? new Date(b.createdDate)
-					: null;
+				const aDate = a.createdDate ? new Date(a.createdDate) : null;
+				const bDate = b.createdDate ? new Date(b.createdDate) : null;
 				return bDate && aDate && bDate > aDate ? 1 : -1;
 			});
 	});
@@ -224,63 +189,36 @@
 		>
 		<div class="flex justify-between flex-wrap">
 			<div class="mx-1">
-				<label
-					for="filterDueStartDate"
-					class="text-left block"
+				<label for="filterDueStartDate" class="text-left block"
 					>Due From Date:</label
 				>
 				<input
 					oninput={(e) => {
 						filterDueStartDate = new Date();
-						const tempDate =
-							e.currentTarget.value.split(
-								"-",
-							);
-						filterDueStartDate.setFullYear(
-							parseInt(tempDate[0]),
-						);
-						filterDueStartDate.setMonth(
-							parseInt(tempDate[1]) -
-								1,
-						);
-						filterDueStartDate.setDate(
-							parseInt(tempDate[2]),
-						);
+						const tempDate = e.currentTarget.value.split("-");
+						filterDueStartDate.setFullYear(parseInt(tempDate[0]));
+						filterDueStartDate.setMonth(parseInt(tempDate[1]) - 1);
+						filterDueStartDate.setDate(parseInt(tempDate[2]));
 					}}
-					value={filterDueStartDate
-						?.toISOString()
-						.split("T")[0]}
+					value={filterDueStartDate?.toISOString().split("T")[0]}
 					type="date"
 					id="filterDueStartDate"
 					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
 			</div>
 			<div class="mx-1">
-				<label
-					for="filterCreatedEndDate"
-					class="text-left block">To Date:</label
+				<label for="filterCreatedEndDate" class="text-left block"
+					>To Date:</label
 				>
 				<input
 					oninput={(e) => {
 						filterDueEndDate = new Date();
-						const tempDate =
-							e.currentTarget.value.split(
-								"-",
-							);
-						filterDueEndDate.setFullYear(
-							parseInt(tempDate[0]),
-						);
-						filterDueEndDate.setMonth(
-							parseInt(tempDate[1]) -
-								1,
-						);
-						filterDueEndDate.setDate(
-							parseInt(tempDate[2]),
-						);
+						const tempDate = e.currentTarget.value.split("-");
+						filterDueEndDate.setFullYear(parseInt(tempDate[0]));
+						filterDueEndDate.setMonth(parseInt(tempDate[1]) - 1);
+						filterDueEndDate.setDate(parseInt(tempDate[2]));
 					}}
-					value={filterDueEndDate
-						?.toISOString()
-						.split("T")[0]}
+					value={filterDueEndDate?.toISOString().split("T")[0]}
 					type="date"
 					id="filterDueEndDate"
 					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -288,65 +226,36 @@
 			</div>
 
 			<div class="mx-1">
-				<label
-					for="filterCreatedStartDate"
-					class="text-left block"
+				<label for="filterCreatedStartDate" class="text-left block"
 					>Created From Date:</label
 				>
 				<input
 					oninput={(e) => {
-						filterCreatedStartDate =
-							new Date();
-						const tempDate =
-							e.currentTarget.value.split(
-								"-",
-							);
-						filterCreatedStartDate.setFullYear(
-							parseInt(tempDate[0]),
-						);
-						filterCreatedStartDate.setMonth(
-							parseInt(tempDate[1]) -
-								1,
-						);
-						filterCreatedStartDate.setDate(
-							parseInt(tempDate[2]),
-						);
+						filterCreatedStartDate = new Date();
+						const tempDate = e.currentTarget.value.split("-");
+						filterCreatedStartDate.setFullYear(parseInt(tempDate[0]));
+						filterCreatedStartDate.setMonth(parseInt(tempDate[1]) - 1);
+						filterCreatedStartDate.setDate(parseInt(tempDate[2]));
 					}}
-					value={filterCreatedStartDate
-						?.toISOString()
-						.split("T")[0]}
+					value={filterCreatedStartDate?.toISOString().split("T")[0]}
 					type="date"
 					id="filterCreatedStartDate"
 					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
 			</div>
 			<div class="mx-1">
-				<label
-					for="filterCreatedEndDate"
-					class="text-left block">To Date:</label
+				<label for="filterCreatedEndDate" class="text-left block"
+					>To Date:</label
 				>
 				<input
 					oninput={(e) => {
-						filterCreatedEndDate =
-							new Date();
-						const tempDate =
-							e.currentTarget.value.split(
-								"-",
-							);
-						filterCreatedEndDate.setFullYear(
-							parseInt(tempDate[0]),
-						);
-						filterCreatedEndDate.setMonth(
-							parseInt(tempDate[1]) -
-								1,
-						);
-						filterCreatedEndDate.setDate(
-							parseInt(tempDate[2]),
-						);
+						filterCreatedEndDate = new Date();
+						const tempDate = e.currentTarget.value.split("-");
+						filterCreatedEndDate.setFullYear(parseInt(tempDate[0]));
+						filterCreatedEndDate.setMonth(parseInt(tempDate[1]) - 1);
+						filterCreatedEndDate.setDate(parseInt(tempDate[2]));
 					}}
-					value={filterCreatedEndDate
-						?.toISOString()
-						.split("T")[0]}
+					value={filterCreatedEndDate?.toISOString().split("T")[0]}
 					type="date"
 					id="filterCreatedEndDate"
 					class="rounded-lg border border-gray-300 bg-gray-800 text-gray-100 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
