@@ -2,10 +2,10 @@
     export let value = "";
     export let label = "";
     export let type: "text" | "textarea" | "password" = "text";
-
     export let classes = "";
-
+    export let maxlength: number = 5000;
     export let onchange = () => {};
+    export let onblur = () => {};
 
     // Add autofocus as a prop
     export let autofocus: boolean = false;
@@ -19,7 +19,9 @@
             placeholder=" "
             bind:value
             onchange={() => onchange()}
-            {autofocus} 
+            {onblur}
+            {autofocus}
+            {maxlength}
         ></textarea>
         <label
             for={label}
@@ -36,7 +38,9 @@
             placeholder=" "
             bind:value
             onchange={() => onchange()}
+            {onblur}
             id={label}
+            {maxlength}
             {autofocus}
         />
         <label
