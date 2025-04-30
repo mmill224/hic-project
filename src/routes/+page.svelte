@@ -173,7 +173,7 @@
 		>
 	</div>
 	<div class="hidden sm:flex justify-between">
-		<MiniButton classes="flex" color="blue" onclick={clearFilters}
+		<MiniButton classes="flex Clear-Filters-Button" color="blue" onclick={clearFilters}
 			><FunnelX />Clear Filters</MiniButton
 		>
 		<div class="flex justify-between flex-wrap">

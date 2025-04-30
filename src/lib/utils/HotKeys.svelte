@@ -15,6 +15,11 @@
       const el = document.querySelector('.New-Note-Button') as HTMLElement;
       el?.click();
     }
+    if (event.altKey && event.key == "Backspace") {
+      event.preventDefault();
+      const el = document.querySelector('.Clear-Filters-Button') as HTMLElement;
+      el?.click();
+    }
     //other hotkeys here
     if (event.altKey && event.key === "r") {
       getTags().then((tags: Tag[]) => {
