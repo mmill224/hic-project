@@ -41,7 +41,7 @@
         onclick={(event) => {
             event.stopPropagation();
         }}
-        class="hover:ring-white hover:ring-2 m-1 p-2 max-w-25 rounded bg-gray-800 text-gray-200 flex justify-between items-center overflow-hidden whitespace-nowrap truncate"
+        class="hover:ring-white hover:ring-2 m-1 p-2 rounded bg-gray-800 text-gray-200 flex justify-between items-center overflow-hidden whitespace-nowrap truncate"
         href={getTagLink(tag)}
     >
         {tag}
