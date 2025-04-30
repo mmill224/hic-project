@@ -125,7 +125,7 @@
 </script>
 
 <Modal size="md" title={note.id ? "Edit Note" : "New Note"} bind:open>
-	<TextInput label="Title" bind:value={note.title} />
+	<TextInput label="Title" bind:value={note.title} stealFocus/>
 	<TipTap content={note.content ?? ""} bind:editor />
 
 	{#if errorMessage}

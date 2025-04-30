@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     export let value = "";
     export let label = "";
     export let type: "text" | "textarea" | "password" = "text";
@@ -6,6 +7,15 @@
     export let maxlength: number = 5000;
     export let onchange = () => {};
     export let onblur = () => {};
+    export let stealFocus = false;
+
+    let inputEl: HTMLInputElement;
+
+    onMount(() => {
+        if (inputEl && stealFocus) {
+            inputEl.focus();
+        }
+    });
 </script>
 
 {#if type == "textarea"}
@@ -37,6 +47,7 @@
             {onblur}
             id={label}
             {maxlength}
+            bind:this={inputEl}
         />
         <label
             for={label}
