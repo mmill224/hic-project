@@ -8,6 +8,7 @@
 	import { db } from "$lib/db";
 	import { onMount } from "svelte";
 	import TagList from "./TagList.svelte";
+	import ViewNote from "./ViewNote.svelte";
 
 	let { note = $bindable(), id = $bindable(0) } = $props<{
 		note: Note;
@@ -53,7 +54,8 @@
 		}
 	});
 
-	let editMode = $state(false);
+	let openEditModal = $state(false);
+	let openViewModal = $state(false);
 	let tags = $state<string[]>([]);
 
 	onMount(async () => {
@@ -68,7 +70,19 @@
 
 <div
 	id="container{id}"
-	class="rounded bg-gray-600 shadow-md max-h-full flex flex-col w-full"
+	class="rounded bg-gray-600 shadow-md max-h-full flex flex-col w-full hover:ring-2 hover:ring-white cursor-pointer"
+	onclick={(e: MouseEvent) => {
+		e.stopPropagation();
+		openViewModal = !openViewModal;
+	}}
+	role="button"
+	tabindex="0"
+	style="z-index: -1;"
+	onkeydown={(e: KeyboardEvent) => {
+		if (e.key === "Enter") {
+			openViewModal = true;
+		}
+	}}
 >
 	<div id="header" class="p-4">
 		<div class="flex justify-between">
@@ -80,8 +94,12 @@
 			>
 				{note?.title ?? "No title available"}
 			</button>
-			<MiniButton color={"red"} onclick={handleDeleteClick}
-				><Trash2 /></MiniButton
+			<MiniButton
+				color={"red"}
+				onclick={(event) => {
+					event.stopPropagation();
+					handleDeleteClick();
+				}}><Trash2 /></MiniButton
 			>
 		</div>
 		<div class="flex text-left justify-between pt-3">
@@ -105,7 +123,7 @@
 		<MiniButton
 			onclick={(e: MouseEvent) => {
 				e.stopPropagation();
-				editMode = !editMode;
+				openEditModal = true;
 			}}><Pencil /></MiniButton
 		>
 	</div>
@@ -113,6 +131,8 @@
 
 <AddOrUpdateNote
 	{note}
-	bind:open={editMode}
+	bind:open={openEditModal}
 	onupdate={(_note) => (note = _note)}
 ></AddOrUpdateNote>
+
+<ViewNote bind:open={openViewModal} {note} {tags} />

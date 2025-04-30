@@ -21,6 +21,6 @@
         >
     {/if}
     {#each tags as element, i}
-        <TagInput bind:editable bind:tag={tags[i]}></TagInput>
+        <TagInput {editable} bind:tag={tags[i]}></TagInput>
     {/each}
 </div>

@@ -14,6 +14,10 @@
         }
     });
 
+    function getTagLink(tagName: string): string {
+        return `/?search=%23${encodeURIComponent(tagName)}`;
+    }
+
     function normalizeInput(event: Event) {
         const target = event.target as HTMLInputElement;
         tag = target.value.toLowerCase().replace(/\s+/g, "-");
@@ -32,9 +36,14 @@
         />
     </span>
 {:else}
-    <span
-        class="m-1 p-1 max-w-25 rounded bg-gray-700 text-gray-100 flex justify-between items-center overflow-hidden  whitespace-nowrap truncate"
+    <a
+        style="z-index: 1;"
+        onclick={(event) => {
+            event.stopPropagation();
+        }}
+        class="hover:ring-white hover:ring-2 m-1 p-2 max-w-25 rounded bg-gray-800 text-gray-200 flex justify-between items-center overflow-hidden whitespace-nowrap truncate"
+        href={getTagLink(tag)}
     >
         {tag}
-    </span>
+    </a>
 {/if}

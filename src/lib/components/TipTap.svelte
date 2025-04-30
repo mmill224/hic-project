@@ -72,7 +72,6 @@
 			` 
 				peer w-full rounded-lg border border-gray-300 bg-gray-800 text-gray-100 
 				focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none
-				hover:cursor-pointer
 			`
 		}
 		${args.class}
@@ -139,7 +138,6 @@
 	}
 
 	.note-content :global(.tiptap) {
-		cursor: text;
 		height: auto; /* not 100% */
 		max-height: 100%;
 		overflow-y: auto;
