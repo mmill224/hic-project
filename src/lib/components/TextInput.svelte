@@ -1,14 +1,21 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     export let value = "";
     export let label = "";
     export let type: "text" | "textarea" | "password" = "text";
-
     export let classes = "";
-
+    export let maxlength: number = 5000;
     export let onchange = () => {};
+    export let onblur = () => {};
+    export let stealFocus = false;
 
-    // Add autofocus as a prop
-    export let autofocus: boolean = false;
+    let inputEl: HTMLInputElement;
+
+    onMount(() => {
+        if (inputEl && stealFocus) {
+            inputEl.focus();
+        }
+    });
 </script>
 
 {#if type == "textarea"}
@@ -19,7 +26,8 @@
             placeholder=" "
             bind:value
             onchange={() => onchange()}
-            {autofocus} 
+            {onblur}
+            {maxlength}
         ></textarea>
         <label
             for={label}
@@ -36,8 +44,10 @@
             placeholder=" "
             bind:value
             onchange={() => onchange()}
+            {onblur}
             id={label}
-            {autofocus}
+            {maxlength}
+            bind:this={inputEl}
         />
         <label
             for={label}

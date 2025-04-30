@@ -63,15 +63,15 @@
 	role="button"
 	tabindex="0"
 	class={`
-		${editable && `peer editable`}
+		min-h-30
+		${editable && `peer editable h-200`}
 
-		note-content overflow-y-auto h-200
+		note-content overflow-y-auto 
 		${
 			editable &&
 			` 
 				peer w-full rounded-lg border border-gray-300 bg-gray-800 text-gray-100 
 				focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none
-				hover:cursor-pointer
 			`
 		}
 		${args.class}
@@ -138,8 +138,9 @@
 	}
 
 	.note-content :global(.tiptap) {
-		cursor: text;
-		height: 100%;
+		height: auto; /* not 100% */
+		max-height: 100%;
+		overflow-y: auto;
 	}
 
 	.note-content :global(.tiptap:focus) {

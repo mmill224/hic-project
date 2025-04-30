@@ -3,10 +3,12 @@
 	import MiniButton from "./MiniButton.svelte";
 	import AddOrUpdateNote from "./AddOrUpdateNote.svelte";
 	import { deleteNote, getTagsForNote } from "$lib/dbDal";
-	import { Trash2, Pencil } from "lucide-svelte"; 
-	import TipTap from "./TipTap.svelte"; 
-	import { db } from "$lib/db"; 
-	import type { Tag } from "$lib/db";
+	import { Trash2, Pencil, Eye } from "lucide-svelte";
+	import TipTap from "./TipTap.svelte";
+	import { db } from "$lib/db";
+	import { onMount } from "svelte";
+	import TagList from "./TagList.svelte";
+	import ViewNote from "./ViewNote.svelte";
 
 	let { note = $bindable(), id = $bindable(0) } = $props<{
 		note: Note;
@@ -14,7 +16,6 @@
 	}>();
 
 	let expandTitle = $state(false);
-	let expandContent = $state(false);
 
 	let dueDateString = $state("");
 	let createdDateString = $state("");
@@ -30,7 +31,6 @@
 		} else {
 			alert("Failed to delete note");
 		}
-
 	};
 	$effect(() => {
 		if (note?.dueDate) {
@@ -54,25 +54,35 @@
 		}
 	});
 
-	let editMode = $state(false);
-	let tags = $state<Tag[]>([]);
+	let openEditModal = $state(false);
+	let openViewModal = $state(false);
+	let tags = $state<string[]>([]);
 
-	async function getTags() {
+	onMount(async () => {
 		if (note?.id) {
-			tags = await getTagsForNote(note.id);
-		} else {
-			tags = [];
+			tags = (await getTagsForNote(note.id)).reduce((acc, tag) => {
+				acc.push(tag.name);
+				return acc;
+			}, [] as string[]);
 		}
-	}
-
-	$effect(() => {
-		getTags();
 	});
 </script>
 
 <div
 	id="container{id}"
-	class="rounded bg-gray-600 shadow-md h-full flex flex-col w-full"
+	class="rounded bg-gray-600 shadow-md max-h-full flex flex-col w-full hover:ring-2 hover:ring-white cursor-pointer"
+	onclick={(e: MouseEvent) => {
+		e.stopPropagation();
+		openViewModal = !openViewModal;
+	}}
+	role="button"
+	tabindex="0"
+	style="z-index: -1;"
+	onkeydown={(e: KeyboardEvent) => {
+		if (e.key === "Enter") {
+			openViewModal = true;
+		}
+	}}
 >
 	<div id="header" class="p-4">
 		<div class="flex justify-between">
@@ -84,8 +94,12 @@
 			>
 				{note?.title ?? "No title available"}
 			</button>
-			<MiniButton color={"red"} onclick={handleDeleteClick}
-				><Trash2 /></MiniButton
+			<MiniButton
+				color={"red"}
+				onclick={(event) => {
+					event.stopPropagation();
+					handleDeleteClick();
+				}}><Trash2 /></MiniButton
 			>
 		</div>
 		<div class="flex text-left justify-between pt-3">
@@ -100,24 +114,16 @@
 	<TipTap
 		content={note.content}
 		editable={false}
-		class="
-			note-content
-			bg-gray-500 text-left w-full shrink h-full overflow-hidden
-			{expandContent ? 'break-all' : 'overflow-hidden line-clamp-5'}
-		"
+		class="note-content bg-gray-500 text-left w-full overflow-hidden"
 	/>
-	<div id="footer" class="flex justify-between p-4 h-20">
+	<div id="footer" class="flex justify-between p-4">
 		<div id="tags" class="flex">
-			{#each tags as tag}
-				<p class="mr-2 bg-gray-700 rounded px-2 py-1 text-sm h-[2em]">
-					{tag.name}
-				</p>
-			{/each}
+			<TagList bind:tags editable={false}></TagList>
 		</div>
 		<MiniButton
 			onclick={(e: MouseEvent) => {
 				e.stopPropagation();
-				editMode = !editMode;
+				openEditModal = true;
 			}}><Pencil /></MiniButton
 		>
 	</div>
@@ -125,6 +131,8 @@
 
 <AddOrUpdateNote
 	{note}
-	bind:open={editMode}
+	bind:open={openEditModal}
 	onupdate={(_note) => (note = _note)}
 ></AddOrUpdateNote>
+
+<ViewNote bind:open={openViewModal} {note} {tags} />

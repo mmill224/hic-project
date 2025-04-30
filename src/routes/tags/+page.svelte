@@ -1,13 +1,19 @@
 <script lang="ts">
+  import TagList from "$lib/components/TagList.svelte";
   import { db } from "$lib/db"; // Import the database instance
   import type { Tag } from "$lib/db";
   import { onMount } from "svelte";
 
-  let tags: Tag[] = []; // Array to store all tags
+  let tags: string[] = []; // Array to store all tags
 
   // Fetch all tags from the database when the component is mounted
   onMount(async () => {
-    tags = await db.tags.toArray();
+    tags = (await db.tags.toArray()).reduce((acc: string[], tag: Tag) => {
+      if (tag.name && !acc.includes(tag.name)) {
+        acc.push(tag.name); // Add unique tag names to the array
+      }
+      return acc;
+    }, []);
   });
 
   // Generate the URL for the home page with the tag in the search bar
@@ -16,18 +22,6 @@
   }
 </script>
 
-<div class="p-4">
-  <h1 class="text-2xl font-bold mb-4">Tags</h1>
-  <ul class="list-disc pl-5">
-    {#each tags as tag}
-      <li>
-        <a
-          href={getTagLink(tag.name)}
-          class="text-blue-500 hover:underline"
-        >
-          #{tag.name}
-        </a>
-      </li>
-    {/each}
-  </ul>
+<div id="tags" class="flex">
+  <TagList {tags} editable={false}></TagList>
 </div>
