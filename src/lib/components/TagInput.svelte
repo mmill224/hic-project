@@ -1,18 +1,8 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-
     let { tag = $bindable(""), editable = $bindable(true) } = $props<{
         tag: string;
         editable?: boolean;
     }>();
-
-    let inputEl: HTMLInputElement;
-
-    onMount(() => {
-        if (editable && inputEl) {
-            inputEl.focus();
-        }
-    });
 
     function getTagLink(tagName: string): string {
         return `/?search=%23${encodeURIComponent(tagName)}`;
@@ -27,7 +17,6 @@
 {#if editable}
     <span>
         <input
-            bind:this={inputEl}
             value={tag}
             oninput={normalizeInput}
             type="text"

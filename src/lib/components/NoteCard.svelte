@@ -135,4 +135,13 @@
 	onupdate={(_note) => (note = _note)}
 ></AddOrUpdateNote>
 
-<ViewNote bind:open={openViewModal} {note} {tags} />
+<ViewNote
+	bind:open={openViewModal}
+	{note}
+	{tags}
+	onEditClick={() => {
+		openViewModal = false;
+		openEditModal = true;
+		return;
+	}}
+/>
