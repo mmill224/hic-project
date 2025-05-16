@@ -8,6 +8,8 @@
 	import { Editor } from "@tiptap/core";
 	import { db } from "$lib/db"; // Import the database instance
 	import TagList from "./TagList.svelte";
+	import { debounce } from "$lib/utils";
+	import { Check } from "lucide-svelte";
 
 	const DEFAULT_NOTE: Note = {
 		title: "",
@@ -31,7 +33,7 @@
 	let success = $state(false);
 	let errorMessage = $state<string>("");
 	let editor = $state<Editor>();
-	let tags = $state<string[]>([]); // Initialize with one empty input
+	let tags = $state<string[]>([]);
 
 	// Fetch tags when the modal is opened
 	$effect(() => {
@@ -58,8 +60,7 @@
 		}
 	}
 
-	async function handleSubmit(e?: MouseEvent) {
-		e?.preventDefault();
+	async function saveNote(): Promise<Note> {
 		errorMessage = "";
 
 		// If the note is already in the database, do not change the created date
@@ -68,7 +69,7 @@
 
 		if (!note.title) {
 			errorMessage = "Please add a title to your note";
-			return;
+			return DEFAULT_NOTE;
 		}
 
 		note.content = editor?.getHTML() ?? note.content;
@@ -81,7 +82,7 @@
 
 			if (!noteId) {
 				errorMessage = "Failed to save the note. Please try again.";
-				return;
+				return DEFAULT_NOTE;
 			}
 
 			// Process tags
@@ -114,19 +115,47 @@
 					await db.noteTagRelation.add({ noteId, tagId: tag.id });
 				}
 			}
-
-			// Reset the form
-			open = false;
-			note = { ...DEFAULT_NOTE };
-			tags = [];
 		}
+		return newNote;
+	}
+
+	async function handleSubmit(e?: MouseEvent) {
+		if (!note.title) return;
+
+		e?.preventDefault();
+
+		let newNote = await saveNote();
+
+		// Reset the form
+		// open = false;
+		// note = { ...DEFAULT_NOTE };
+		// tags = [];
 		onupdate(newNote);
 	}
+
+	let dirty = $state(false);
+
+	const autoSaveWithDebounce = debounce(() => {
+		if (note.title) {
+			console.log("Debounced callback fired");
+			saveNote();
+			dirty = false;
+		}
+	}, 2000);
+
+	const handleInputWithDebounce = () => {
+		dirty = true;
+		autoSaveWithDebounce();
+	};
 </script>
 
 <Modal size="md" title={note.id ? "Edit Note" : "New Note"} bind:open>
-	<TextInput label="Title" bind:value={note.title} stealFocus/>
-	<TipTap content={note.content ?? ""} bind:editor />
+	<TextInput label="Title" bind:value={note.title} stealFocus />
+	<TipTap
+		content={note.content ?? ""}
+		bind:editor
+		onInput={handleInputWithDebounce}
+	/>
 
 	{#if errorMessage}
 		<div class="text-red-500 m-2">{errorMessage}</div>
@@ -159,6 +188,17 @@
 
 	<div class="flex justify-between mt-4">
 		<div></div>
-		<Button onclick={handleSubmit}>Submit</Button>
+		<span class="flex">
+			<div class="flex justify-center items-center w-full h-full mr-2">
+				{#if dirty}
+					<div
+						class="w-4 h-4 border-2 border-gray-300 border-t-gray-800 rounded-full animate-spin"
+					></div>
+				{:else}
+					<Check class="text-green" />
+				{/if}
+			</div>
+			<Button onclick={handleSubmit}>Submit</Button>
+		</span>
 	</div>
 </Modal>

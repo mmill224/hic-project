@@ -3,6 +3,7 @@
 	import StarterKit from "@tiptap/starter-kit";
 	import Icon from "@iconify/svelte";
 	import Underline from "@tiptap/extension-underline";
+	import { on } from "svelte/events";
 
 	let {
 		content,
@@ -10,6 +11,7 @@
 		editable = true,
 		editor = $bindable<Editor>(),
 		onclick,
+		onInput,
 		...args
 	}: {
 		content: string;
@@ -18,6 +20,7 @@
 		onupdate?: (editor: Editor) => void;
 		editor?: Editor;
 		class?: string;
+		onInput?: () => void;
 	} = $props();
 	let element = $state<Element>();
 
@@ -77,6 +80,7 @@
 		${args.class}
 	`}
 	aria-label="Note Content."
+	oninput={onInput}
 >
 	{#if editable}
 		<div class="toolbar-bg">

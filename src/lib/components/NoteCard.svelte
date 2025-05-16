@@ -129,11 +129,7 @@
 	</div>
 </div>
 
-<AddOrUpdateNote
-	{note}
-	bind:open={openEditModal}
-	onupdate={(_note) => (note = _note)}
-></AddOrUpdateNote>
+<AddOrUpdateNote {note} bind:open={openEditModal}></AddOrUpdateNote>
 
 <ViewNote
 	bind:open={openViewModal}
