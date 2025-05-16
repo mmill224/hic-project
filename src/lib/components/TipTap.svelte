@@ -3,7 +3,6 @@
 	import StarterKit from "@tiptap/starter-kit";
 	import Icon from "@iconify/svelte";
 	import Underline from "@tiptap/extension-underline";
-	import { on } from "svelte/events";
 
 	let {
 		content,
@@ -12,6 +11,7 @@
 		editor = $bindable<Editor>(),
 		onclick,
 		onInput,
+		onChange,
 		...args
 	}: {
 		content: string;
@@ -21,6 +21,7 @@
 		editor?: Editor;
 		class?: string;
 		onInput?: () => void;
+		onChange?: () => void;
 	} = $props();
 	let element = $state<Element>();
 
@@ -38,6 +39,7 @@
 				editable: editable,
 				onUpdate: () => {
 					onupdate && onupdate(editor);
+					onChange && onChange();
 				},
 				onTransaction: () => {
 					// force re-render so `editor.isActive` works as expected
@@ -81,6 +83,7 @@
 	`}
 	aria-label="Note Content."
 	oninput={onInput}
+	onchange={onChange}
 >
 	{#if editable}
 		<div class="toolbar-bg">

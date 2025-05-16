@@ -8,7 +8,7 @@
 	import { Editor } from "@tiptap/core";
 	import { db } from "$lib/db"; // Import the database instance
 	import TagList from "./TagList.svelte";
-	import { debounce } from "$lib/utils";
+	import { throttle } from "$lib/utils";
 	import { Check } from "lucide-svelte";
 
 	const DEFAULT_NOTE: Note = {
@@ -58,6 +58,17 @@
 				.toArray();
 			tags = existingTags.map((tag) => tag.name); // Populate tags with tag names
 		}
+	}
+
+	// simply saves the note to the database. does not enforce validations, does not save tags, does not save due date
+	async function autoSaveNote(): Promise<boolean> {
+		var newNote = { ...note };
+		if (!note.id) {
+			newNote.createdDate = new Date();
+		}
+
+		newNote.content = editor?.getHTML() ?? note.content;
+		return await addOrUpdateNote(newNote);
 	}
 
 	async function saveNote(): Promise<Note> {
@@ -135,17 +146,16 @@
 
 	let dirty = $state(false);
 
-	const autoSaveWithDebounce = debounce(() => {
+	const autoSaveWithThrottle = throttle(() => {
 		if (note.title) {
-			console.log("Debounced callback fired");
-			saveNote();
+			autoSaveNote();
 			dirty = false;
 		}
 	}, 2000);
 
-	const handleInputWithDebounce = () => {
+	const handleInputWithThrottle = () => {
 		dirty = true;
-		autoSaveWithDebounce();
+		autoSaveWithThrottle();
 	};
 </script>
 
@@ -154,7 +164,7 @@
 	<TipTap
 		content={note.content ?? ""}
 		bind:editor
-		onInput={handleInputWithDebounce}
+		onChange={handleInputWithThrottle}
 	/>
 
 	{#if errorMessage}
