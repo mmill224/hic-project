@@ -1,6 +1,6 @@
 import Dexie from "dexie";
 import { db } from "$lib/db";
-import type { Note, Tag, noteTagRelation} from "$lib/db";
+import type { Note, Tag, noteTagRelation, RestorableNote } from "$lib/db";
 
 export async function addOrUpdateNote(note: Note, tags: Tag[] = []): Promise<boolean> {
     try {
@@ -18,9 +18,28 @@ export async function addOrUpdateNote(note: Note, tags: Tag[] = []): Promise<boo
     }
 }
 
+async function addNoteToRestorableNotes(note: Note | undefined): Promise<boolean> {
+    if (note) {
+        try {
+            var restorableNote: RestorableNote = {
+                note: {...note},
+                dateDeleted: new Date()
+            }
+            await db.restorableNotes.add(restorableNote);
+            return true;
+        }
+        catch (error) {
+            console.log(error);
+        }
+        return false;
+    }
+    return false;
+}
+
 export async function deleteNote(note: Note | undefined): Promise<boolean> {
     try {
-        await db.notes.delete(note?.id ?? -1)
+        await db.notes.delete(note?.id ?? -1);
+        await addNoteToRestorableNotes(note);
         return true;
     } catch (error) {
         console.log(error);

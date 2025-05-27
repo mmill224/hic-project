@@ -138,24 +138,24 @@
 		let newNote = await saveNote();
 
 		// Reset the form
-		// open = false;
-		// note = { ...DEFAULT_NOTE };
-		// tags = [];
+		open = false;
+		note = { ...DEFAULT_NOTE };
+		tags = [];
 		onupdate(newNote);
 	}
 
 	let dirty = $state(false);
 
 	const autoSaveWithThrottle = throttle(() => {
-		if (note.title) {
-			autoSaveNote();
-			dirty = false;
-		}
+		autoSaveNote();
+		dirty = false;
 	}, 2000);
 
 	const handleInputWithThrottle = () => {
-		dirty = true;
-		autoSaveWithThrottle();
+		if (note.title && note.id) {
+			dirty = true;
+			autoSaveWithThrottle();
+		}
 	};
 </script>
 
@@ -204,7 +204,7 @@
 					<div
 						class="w-4 h-4 border-2 border-gray-300 border-t-gray-800 rounded-full animate-spin"
 					></div>
-				{:else}
+				{:else if note.id}
 					<Check class="text-green" />
 				{/if}
 			</div>

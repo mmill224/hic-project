@@ -6,7 +6,7 @@ export interface Tag {
     id?: number;
     name: string;
     color: string;
-}   
+}
 
 export interface Note {
     id?: number;
@@ -14,6 +14,12 @@ export interface Note {
     content?: string;
     dueDate?: Date;
     createdDate?: Date;
+}
+
+export interface RestorableNote {
+    dateDeleted: Date;
+    note: Note;
+    id?: number;
 }
 
 export interface noteTagRelation {
@@ -29,17 +35,20 @@ export class MyAppDatabase extends Dexie {
     notes: Dexie.Table<Note, number>;
     tags: Dexie.Table<Tag, number>;
     noteTagRelation: Dexie.Table<noteTagRelation, number>;
+    restorableNotes: Dexie.Table<RestorableNote, number>;
 
     constructor() {
         super('myAppDatabase');
-        this.version(1).stores({
+        this.version(2).stores({
             notes: '++id, title, content, dueDate, createdDate', // primary key and indexed properties
             tags: '++id, name, color',
-            noteTagRelation: '++id, tagId, noteId'
-        });
+            noteTagRelation: '++id, tagId, noteId',
+            restorableNotes: '++id, dateDeleted'
+        }).upgrade(() => { });
         this.notes = this.table('notes');
         this.tags = this.table('tags');
         this.noteTagRelation = this.table('noteTagRelation');
+        this.restorableNotes = this.table('restorableNotes');
     }
 }
 
